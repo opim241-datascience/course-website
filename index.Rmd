@@ -17,10 +17,4 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
-Hello!
-
-
-```{r embed-xaringan, echo=FALSE}
-xaringanExtra::embed_xaringan(url = "slides/01/Week1.html")
-```
-
+Welcome. This website is still work in progress. 
