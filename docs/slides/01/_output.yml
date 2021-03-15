@@ -1,6 +1,6 @@
 xaringan::moon_reader:
   self_contained: true
-  css: ["../setup/bigdata.css", "../setup/slides.css"]
+  css: ["../setup/bigdata.css"]
   nature:
     ratio: "16:9"
     highlightStyle: github

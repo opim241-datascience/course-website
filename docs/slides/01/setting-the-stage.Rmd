@@ -1,0 +1,138 @@
+class: center, middle, inverse
+
+# Why?
+
+---
+
+## Goal
+
+* If you can manipulate data, you’re more likely to be useful
+
+* You may need to switch and learn new tools to remain useful
+
+* Useful people get through life better
+
+---
+
+
+## {data-background=./images/kathy-sierra-graph.jpg}
+
+---
+
+
+## {data-background=./images/fire_deadlift.gif}
+
+---
+
+## {data-background=./images/spreadsheets-and-bs.png}
+
+---
+
+## {data-background=./images/jdlong-twitter.png}
+
+---
+
+class: inverse, middle, center
+
+# Spreadsheets?... Sure!
+
+---
+
+## {data-background=./images/excel-2018.png}
+
+---
+
+## The good
+
+* Easy to know where to start... just add data
+
+* Simple data structure
+
+* Visual formula creation: click on the numbers you want
+
+* See the numbers change!
+
+* Easily accessible to almost everyone
+
+---
+
+
+## Excel Power Tools
+
+* Pivot Tables
+* Conditional Formatting
+* VBA
+
+---
+
+## Excel is Programming
+
+```
+The purpose of programming is to find a sequence of instructions that will automate the performance of a task [...] on a computer, often for solving a given problem.
+```
+
+* Don’t let anyone tell you it’s not real programming
+
+---
+
+# The bad
+
+---
+
+## {data-background=./images/excel-out-of-memory.png}
+
+---
+
+## {data-background=./images/excel-comments.png}
+
+---
+
+## {data-background=./images/vlookup-craziness.jpg}
+
+---
+
+## {data-background=./images/excel-each-cell-must-be-inspected.png}
+
+---
+
+## Oh no!
+
+* https://www.nytimes.com/1995/01/04/business/magellan-error-is-explained.html
+* https://www.businessinsider.com/editor-talks-reinhart-rogoff-excel-error-201
+* https://www.wsj.com/articles/stop-using-excel-finance-chiefs-tell-staffs-1511346601
+
+---
+
+# R
+
+## Why R?
+
+1. R Has The Best Overall Qualities For Business
+2. R Is Data Science For Non-Computer Scientists
+3. Learning R Is Easy With The Tidyverse
+4. R Has Brains, Muscle, And Heart
+5. R Is Built For Business
+6. R Community Support
+7. This presentation was built with R
+
+
+## R Teaching Philosophy for this Course
+
+
+
+* Base R first: teach syntax such as $ and [[]], loops and conditionals, data types (numeric, character, data frame, matrix), and built-in functions like ave and tapply. Possibly follow up by introducing dplyr or data.table as alternatives.
+* Tidyverse first: Start from scratch with the dplyr package for manipulating a data frame, and introduce others like ggplot2, tidyr and purrr shortly afterwards. Introduce the %>% operator from magrittr immediately, but skip syntax like [[]] and $ or leave them for late in the course. Keep a single-minded focus on data frames.
+
+
+## {data-background=./images/data-science.png}
+
+
+## Tutorial
+
+https://rstudio.cloud/project/674658
+
+
+
+
+
+

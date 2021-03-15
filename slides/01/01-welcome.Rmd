@@ -81,6 +81,11 @@ knitr::include_graphics("img/rstudio.png")
 
 ---
 
+```{r child='setting-the-stage.Rmd'}
+```
+
+---
+
 class: middle
 
 # Data science life cycle

@@ -82,10 +82,6 @@ Personal
 * Introduce R, RStudio, RMarkdown, git, GitHub (the tools)
 * Lab
 
----
-
-
-
 
 ---
 
