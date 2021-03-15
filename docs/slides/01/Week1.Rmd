@@ -17,13 +17,9 @@ background-size: cover
 
 ---
 
-class: inverse
+class: inverse, center, middle
 
-## Your hosts
-
-.center[
-<img src="img/screams.png" width=600>
-]
+# Your hosts
 
 ---
 

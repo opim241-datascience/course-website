@@ -9,7 +9,7 @@ library(tidyverse)
 library(emo)
 ```
 
-class: middle
+class: middle, center, inverse
 
 # Hello world!
 
@@ -57,7 +57,7 @@ A: We can discuss that over `r emo::ji("coffee")`.
 
 ---
 
-class: middle
+class: inverse, center, middle
 
 # Software
 
@@ -86,7 +86,7 @@ knitr::include_graphics("img/rstudio.png")
 
 ---
 
-class: middle
+class: inverse, center, middle
 
 # Data science life cycle
 
@@ -189,7 +189,7 @@ knitr::include_graphics("img/unvotes/unvotes.gif")
 
 ---
 
-class: middle
+class: inverse, center, middle
 
 # Let's dive in!
 

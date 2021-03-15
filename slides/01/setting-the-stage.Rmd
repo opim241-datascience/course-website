@@ -14,21 +14,27 @@ class: center, middle, inverse
 
 ---
 
+background-image: url("img/kathy-sierra-graph.jpg")
+background-size: contain
 
-## {data-background=./images/kathy-sierra-graph.jpg}
+---
+
+
+background-image: url("img/fire_deadlift.gif")
+background-size: cover
 
 ---
 
 
-## {data-background=./images/fire_deadlift.gif}
+background-image: url("img/spreadsheets-and-bs.png")
+background-size: contain
+
 
 ---
 
-## {data-background=./images/spreadsheets-and-bs.png}
+background-image: url("img/jdlong-twitter.png")
+background-size: contain
 
----
-
-## {data-background=./images/jdlong-twitter.png}
 
 ---
 
@@ -38,7 +44,9 @@ class: inverse, middle, center
 
 ---
 
-## {data-background=./images/excel-2018.png}
+background-image: url("img/excel-2018.png")
+background-size: contain
+
 
 ---
 
@@ -67,9 +75,11 @@ class: inverse, middle, center
 
 ## Excel is Programming
 
-```
-The purpose of programming is to find a sequence of instructions that will automate the performance of a task [...] on a computer, often for solving a given problem.
-```
+
+
+  The purpose of programming is to find a sequence of instructions that will automate the performance of a task [...] on a computer, often for solving a given problem.
+
+--
 
 * Don’t let anyone tell you it’s not real programming
 
@@ -79,19 +89,26 @@ The purpose of programming is to find a sequence of instructions that will autom
 
 ---
 
-## {data-background=./images/excel-out-of-memory.png}
+background-image: url("img/excel-out-of-memory.png")
+background-size: contain
+
+
 
 ---
 
-## {data-background=./images/excel-comments.png}
+background-image: url("img/excel-comments.png")
+background-size: contain
 
 ---
 
-## {data-background=./images/vlookup-craziness.jpg}
+background-image: url("img/vlookup-craziness.jpg")
+background-size: contain
+
 
 ---
 
-## {data-background=./images/excel-each-cell-must-be-inspected.png}
+background-image: url("img/excel-each-cell-must-be-inspected.png")
+background-size: contain
 
 ---
 
@@ -103,9 +120,13 @@ The purpose of programming is to find a sequence of instructions that will autom
 
 ---
 
-# R
+class: center, middle, inverse
 
-## Why R?
+# `R`
+
+---
+
+## Why `R`?
 
 1. R Has The Best Overall Qualities For Business
 2. R Is Data Science For Non-Computer Scientists
@@ -115,24 +136,21 @@ The purpose of programming is to find a sequence of instructions that will autom
 6. R Community Support
 7. This presentation was built with R
 
+---
 
 ## R Teaching Philosophy for this Course
 
 
+1. Start with cake
 
-* Base R first: teach syntax such as $ and [[]], loops and conditionals, data types (numeric, character, data frame, matrix), and built-in functions like ave and tapply. Possibly follow up by introducing dplyr or data.table as alternatives.
-* Tidyverse first: Start from scratch with the dplyr package for manipulating a data frame, and introduce others like ggplot2, tidyr and purrr shortly afterwards. Introduce the %>% operator from magrittr immediately, but skip syntax like [[]] and $ or leave them for late in the course. Keep a single-minded focus on data frames.
+--
+1. Cherish day one
 
+--
+1. Skip baby steps
 
-## {data-background=./images/data-science.png}
+--
+1. Hide the veggies
 
-
-## Tutorial
-
-https://rstudio.cloud/project/674658
-
-
-
-
-
-
+--
+1. Leverage the ecosystem

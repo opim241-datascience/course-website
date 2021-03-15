@@ -11,35 +11,8 @@ library(sugrrants)
 library(lubridate)
 ```
 
-## Course toolkit
 
-<br>
-
-.pull-left[
-### .gray[Course operation]
-.gray[
-- introds.org
-- Learn
-- Zoom
-- Teams
-- Piazza
-]
-]
-.pull-right[
-### .gray[Doing data science]
-- .gray[Programming:]
-  - .gray[R]
-  - .gray[RStudio]
-  - .gray[tidyverse]
-  - .gray[R Markdown]
-- .pink[Version control and collaboration:]
-  - .pink[Git]
-  - .pink[GitHub]
-]
-
----
-
-class: middle
+class: center, middle, inverse
 
 # Git and GitHub
 

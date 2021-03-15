@@ -11,6 +11,12 @@ library(sugrrants)
 library(lubridate)
 ```
 
+class: center, middle, inverse
+
+# Meet the toolkit
+
+---
+
 ## Course toolkit
 
 <br>
@@ -18,13 +24,12 @@ library(lubridate)
 .pull-left[
 ### .gray[Course operation]
 .gray[
-- introds.org
-- Learn
-- Zoom
-- Teams
-- Piazza
+- http://opim241.netlify.app
+- Canvas
+- Slack
+- RStudio Cloud
 ]
-]
+
 .pull-right[
 ### .pink[Doing data science]
 - .pink[Programming:]

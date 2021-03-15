@@ -642,7 +642,7 @@ Assignments
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="assigment-instructions/assignment-pet-names/hw-01-pet-names.html">Week 1</a>
+<a href="assignment-instructions/assignment-pet-names/hw-01-pet-names.html">Week 1</a>
 </div>
 </div>
 <div class="nav-dropdown">

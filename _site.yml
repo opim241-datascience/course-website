@@ -19,7 +19,7 @@ navbar:
     - text: "Assignments"
       menu:
         - text: "Week 1"
-          href: assigment-instructions/assignment-pet-names/hw-01-pet-names.html
+          href: assignment-instructions/assignment-pet-names/hw-01-pet-names.html
     - text: "Labs"
       menu:
         - text: "Week 1"
