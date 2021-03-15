@@ -29,6 +29,7 @@ class: center, middle, inverse
 - Slack
 - RStudio Cloud
 ]
+]
 
 .pull-right[
 ### .pink[Doing data science]
@@ -66,7 +67,7 @@ By the end of the course, you will be able to...
 
 ---
 
-class: middle
+class: inverse, center, middle
 
 # Reproducible data analysis
 

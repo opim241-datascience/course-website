@@ -303,11 +303,6 @@ knitr::include_graphics("img/unvotes/unvotes-14.jpeg")
 
 ---
 
-.center[
-.large[
-[minecr.shinyapps.io/unvotes](https://minecr.shinyapps.io/unvotes/)
-]
-]
 
 ```{r echo=FALSE, out.width="65%"}
 knitr::include_graphics("img/unvotes/unvotes-15.png")
