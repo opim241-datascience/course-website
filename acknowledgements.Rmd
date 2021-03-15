@@ -1,0 +1,9 @@
+---
+title: "Acknowledgments"
+---
+
+# Thank you!
+
+Most of the materials in this course have been sourced and adapted from [Data Science in a Box](https://datasciencebox.org/), which was open sourced by many `#rstats` community members.
+
+

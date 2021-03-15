@@ -1,0 +1,103 @@
+---
+title: "Data Science: Hello World!"
+subtitle: "OPIM 241 - Data Science"  
+institution: "Georgetown University"
+author: "Marck Vaisman"
+date: "Spring 2021"
+---
+
+
+```{r child='../setup/setup-options.Rmd'}
+```
+
+
+background-image: url("https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif")
+background-size: cover
+
+
+---
+
+class: inverse
+
+## Your hosts
+
+.center[
+<img src="img/screams.png" width=600>
+]
+
+---
+
+
+## Marck
+
+.pull-left[
+<img src="img/marck-vaisman-headshot.jpg" width=300>
+]
+
+.pull-right[
+Professional
+
+* Sr. Cloud Solutions Architect @ Microsoft
+* Adjunct professor at Georgetown and GWU
+* Co-founder of [DataCommunityDC](www.datacommunitydc.org)
+
+Personal
+
+* R Fanatic
+* Goofball
+* **I play great music in class!**
+]
+
+
+---
+
+
+## Doug (unofficial TA)
+
+.pull-left[
+<img src="img/doug.png" width=300>
+]
+
+.pull-right[
+Professional
+
+* Researcher at Georgetown's Massive Data Institute (McCourt School)
+* M.S. Data Science and Analysis, Georgetown
+* B.S. Math, UMD
+
+Personal
+
+* Personal trainer
+* Snowboarding
+* Painting
+* Just finished first PC build
+]
+
+
+---
+
+## Agenda and Goals for Today
+
+* Very Brief Course Overview (lots of info in Syllabus)
+* Introduce R, RStudio, RMarkdown, git, GitHub (the tools)
+* Lab
+
+---
+
+
+
+
+---
+
+```{r child='01-welcome.Rmd'}
+```
+
+---
+
+```{r child='02-r.Rmd'}
+```
+
+---
+
+```{r child='03-git.Rmd'}
+```

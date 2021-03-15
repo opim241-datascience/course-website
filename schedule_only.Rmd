@@ -1,0 +1,19 @@
+---
+output:
+  md_document:
+    variant: gfm
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo = FALSE, results="asis"} 
+source("schedule.R")
+sched %>%
+  knitr:::kable(., "markdown",
+                col.names = c("Class", "Date", "Topics", "Lab",
+                               "Reading", "Notes"),
+                booktabs = T
+  ) 
+```  

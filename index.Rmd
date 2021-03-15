@@ -1,0 +1,26 @@
+---
+title: "OPIM 241 - Data Science"
+subtitle: "McDonough School of Business, Spring 2021"
+description:
+  This the course website for OPIM 241 - Data Science.
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
+
+# Learn more about publishing to GitHub Pages at:
+# https://rstudio.github.io/distill/publish_website.html#github-pages
+
+```
+
+Hello!
+
+
+```{r embed-xaringan, echo=FALSE}
+xaringanExtra::embed_xaringan(url = "slides/01/Week1.html")
+```
+

@@ -1,0 +1,18 @@
+```{r, echo = F}
+tribble(
+  ~printer, ~fns, ~link, 
+  "gt", "`as_gt()`", "[gt](https://gt.rstudio.com/index.html)",
+  "kable", "`as_kable()`","[kable](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html)",
+  "flextable", "`as_flex_table()`","[flextable](https://davidgohel.github.io/flextable/articles/overview.html)",
+  "kableExtra", "`as_kable_extra()`","[kableExtra](http://haozhu233.github.io/kableExtra/)",
+  "huxtable", "`as_hux_table()`", "[huxtable](https://hughjonesd.github.io/huxtable/)",
+  "tibble", "`as_tibble()`", "[tibble](https://tibble.tidyverse.org/)",
+) %>% 
+  gt::gt() %>%
+  gt::cols_move_to_start(columns = vars(link, fns)) %>%
+  gt::cols_hide(columns = vars(printer)) %>%
+  gt::cols_label(link = gt::md("**Print Engine**"), 
+                 fns = gt::md("**Function**")) %>%
+  gt::fmt_markdown(columns = vars(fns, link)) %>%
+  gt::cols_width(vars(link, fns) ~ px(250))
+```
