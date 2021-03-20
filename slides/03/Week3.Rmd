@@ -1,0 +1,37 @@
+---
+title: "Working with Data: Wrangling and Tidying"
+subtitle: "OPIM 241 - Data Science"  
+institution: "Georgetown University"
+author: "Marck Vaisman"
+date: "Spring 2021"
+---
+
+
+```{r child='../setup/setup-options.Rmd'}
+```
+
+
+```{r child='01-tidy-data.Rmd'}
+```
+
+---
+
+```{r child='02-grammar-wrangle.Rmd'}
+```
+
+---
+
+```{r child='03-single-df.Rmd'}
+```
+
+---
+
+```{r child='04-multi-df.Rmd'}
+```
+
+---
+
+```{r child='05-tidying.Rmd'}
+```
+
+
