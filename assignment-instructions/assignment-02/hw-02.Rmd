@@ -1,5 +1,6 @@
 ---
 title: "HW 02 - Airbnb listings in Edinburgh"
+subtitle: "OPIM 241 - Data Science - Spring 2021"
 output: 
   tufte::tufte_html:
     css: ../hw.css
@@ -27,15 +28,30 @@ Using data provided by Airbnb, we can explore how Airbnb availability and prices
 
 # Getting started
 
-```{marginfigure}
-**IMPORTANT:** If there is no GitHub repo created for you for this assignment, it means I didn't have your GitHub username as of when I assigned the homework. Please let me know your GitHub username asap, and I can create your repo.
+- [Click here to go the the Assignment in Canvas](https://georgetown.instructure.com/courses/126656/assignments/565092)
+- Click on the link inside the assignment to go to the acceptance page. You should see something like the following screen, but the name of the repository that will be created is `assignment-02-YOURGITHUBUSERNAME`:
+
+Note: the screen shots are for reference, the repository names will be different.
+
+```{r echo=FALSE, eval=TRUE}
+knitr::include_graphics("img/gh1.png")
 ```
 
-Go to the course GitHub organization and locate your homework repo, which should be named `hw-02-airbnb-edi-YOUR_GITHUB_USERNAME`.
-Grab the URL of the repo, and clone it in RStudio.
-First, open the R Markdown document `hw-02.Rmd` and Knit it.
+- Click on the green _Accept the assignment_ button and you will see a confirmation page:
+
+```{r echo=FALSE, eval=TRUE}
+knitr::include_graphics("img/gh2.png")
+```
+
+- Click on the [Course's GitHub Organization Page](https://github.com/opim241-datascience) and you will see your private repository there. Rememeber you need to be logged into GitHub.
+
+- Grab the URL of **YOUR** repo, and clone it in RStudio.
+Refer to [Lab 1](https://opim241.netlify.app/lab-instructions/lab-01/lab-01-hello-r.html) if you would like to see step-by-step instructions for cloning a repo into an RStudio project.
+
+- Open the R Markdown document `hw-02.Rmd` and Knit it.
 Make sure it compiles without errors.
 The output will be in the file markdown `.md` file with the same name.
+
 
 ## Warm up
 
@@ -48,9 +64,7 @@ Before we introduce the data, let's warm up with some simple exercises.
 
 ## Packages
 
-We'll use the **tidyverse** package for much of the data wrangling and visualisation and the data lives in the **dsbox** package.
-These packages are already installed for you.
-You can load them by running the following in your Console:
+We'll use the **tidyverse** package for much of the data wrangling and visualization and the data lives in the **dsbox** package. You may need to install the **dsbox** package.
 
 ```{r load-packages, message = FALSE}
 library(tidyverse)

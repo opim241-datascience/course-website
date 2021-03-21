@@ -1,5 +1,6 @@
 ---
 title: "Lab 02 - Global plastic waste"
+subtitle: "OPIM 241 - Data Science - Spring 2021"
 output: 
   tufte::tufte_html:
     tufte_variant: "envisioned"
@@ -26,17 +27,25 @@ Additionally, National Geographic ran a data visualization communication contest
 
 # Getting started
 
-Go to the course GitHub organization and locate your assignment repo, which should be named `lab-02-plastic-waste-YOUR_GITHUB_USERNAME`.
-If you're in the right place, it should look like the following.
+- [Click here to go the the Lab in Canvas](https://georgetown.instructure.com/courses/126656/assignments/564051)
+- Click on the link inside the assignment to go to the acceptance page. You should see something like the following screen, but the name of the repository that will be created is `lab-2-YOURGITHUBUSERNAME`:
 
 ```{r echo=FALSE, eval=TRUE}
-knitr::include_graphics("img/repo-begin.png")
+knitr::include_graphics("img/gh1.png")
 ```
 
-Grab the URL of the repo, and clone it in RStudio.
-Refer to [HW 00](https://ids-s1-20.github.io/homework/hw-00/hw-00-pet-names.html) if you would like to see step-by-step instructions for cloning a repo into an RStudio project.
+- Click on the green _Accept the assignment_ button and you will see a confirmation page:
 
-First, open the R Markdown document `lab-02.Rmd` and Knit it.
+```{r echo=FALSE, eval=TRUE}
+knitr::include_graphics("img/gh2.png")
+```
+
+- Click on the [Course's GitHub Organization Page](https://github.com/opim241-datascience) and you will see your private repository there. Rememeber you need to be logged into GitHub.
+
+- Grab the URL of **YOUR** repo, and clone it in RStudio.
+Refer to [Lab 1](https://opim241.netlify.app/lab-instructions/lab-01/lab-01-hello-r.html) if you would like to see step-by-step instructions for cloning a repo into an RStudio project.
+
+- Open the R Markdown document `lab-02.Rmd` and Knit it.
 Make sure it compiles without errors.
 The output will be in the file markdown `.md` file with the same name.
 
