@@ -57,7 +57,7 @@ What does each column represent?
 ?starwars
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, out.width="80%"}
 knitr::include_graphics("img/starwars-help.png")
 ```
 
@@ -167,7 +167,7 @@ knitr::include_graphics("img/ggplot2-part-of-tidyverse.png")
 A grammar of graphics is a tool that enables us to concisely describe the components of a graphic
 ]
 .pull-right-wide[
-```{r echo=FALSE, out.width="100%"}
+```{r echo=FALSE, out.width="80%"}
 knitr::include_graphics("img/grammar-of-graphics.png")
 ```
 ]

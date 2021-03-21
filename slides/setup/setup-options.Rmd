@@ -39,6 +39,8 @@ conflict_prefer("filter", "dplyr")
 # xaringanExtra
 library(xaringanExtra)
 xaringanExtra::use_panelset()
+xaringanExtra::use_extra_styles(hover_code_line = TRUE,
+                                mute_unhighlighted_code = TRUE)
 
 # output number of lines
 hook_output <- knitr::knit_hooks$get("output")
