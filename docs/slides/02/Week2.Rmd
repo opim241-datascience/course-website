@@ -1,0 +1,32 @@
+---
+title: "Working with Data: Data Visualization"
+subtitle: "OPIM 241 - Data Science"  
+institution: "Georgetown University"
+author: "Marck Vaisman"
+date: "Spring 2021"
+---
+
+
+```{r child='../setup/setup-options.Rmd'}
+```
+
+
+```{r child='01-data-viz.Rmd'}
+```
+
+---
+
+```{r child='02-ggplot2.Rmd'}
+```
+
+---
+
+```{r child='03-viz-num.Rmd'}
+```
+
+---
+
+```{r child='04-viz-cat.Rmd'}
+```
+
+

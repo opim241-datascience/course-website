@@ -16,14 +16,20 @@ navbar:
       menu:
         - text: "Week 1"
           href: slides/01/Week1.html
+        - text: "Week 2"
+          href: slides/02/Week2.html
     - text: "Assignments"
       menu:
         - text: "Week 1"
           href: assignment-instructions/assignment-pet-names/hw-01-pet-names.html
+        - text: "Week 2"
+          href: assignment-instructions/assignment-02/hw-02.html
     - text: "Labs"
       menu:
         - text: "Week 1"
           href: lab-instructions/lab-01/lab-01-hello-r.html
+        - text: "Week 2"
+          href: lab-instructions/lab-02/lab-02-plastic-waste.html
     - text: "Acknowledgements"
       href: acknowledgements.html
     
