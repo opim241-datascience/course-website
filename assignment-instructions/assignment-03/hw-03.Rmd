@@ -28,15 +28,12 @@ It covers all recorded accidents in Edinburgh in 2018 and some of the variables 
 
 # Getting started
 
-```{marginfigure}
-**IMPORTANT:** If there is no GitHub repo created for you for this assignment, it means I didn't have your GitHub username as of when I assigned the homework. Please let me know your GitHub username asap, and I can create your repo.
-```
-
-Go to the course GitHub organization and locate your homework repo, which should be named `hw-03-accidents-YOUR_GITHUB_USERNAME`.
-Grab the URL of the repo, and clone it in RStudio.
-First, open the R Markdown document `hw-03.Rmd` and Knit it.
-Make sure it compiles without errors.
-The output will be in the file markdown `.md` file with the same name.
+- [Click here to go the the Assignment in Canvas](https://georgetown.instructure.com/courses/126656/assignments/570410)
+- Click on the link inside the assignment to go to the acceptance page and accept the assignment. The name of the repository that will be created for you is `assignment-03-YOURGITHUBUSERNAME`:
+- Grab the URL of the repo, and clone it in RStudio.
+- First, open the R Markdown document `hw-03.Rmd` and Knit it.
+- Make sure it compiles without errors.
+- The output will be in the file markdown `.md` file with the same name.
 
 ## Warm up
 
