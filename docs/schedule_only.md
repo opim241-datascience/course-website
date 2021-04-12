@@ -634,6 +634,8 @@ Slides
 <div class="nav-dropdown-content">
 <a href="slides/01/Week1.html">Week 1</a>
 <a href="slides/02/Week2.html">Week 2</a>
+<a href="slides/03/Week3.html">Week 3</a>
+<a href="slides/04/Week4.html">Week 4</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -643,8 +645,10 @@ Assignments
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="assignment-instructions/assignment-pet-names/hw-01-pet-names.html">Week 1</a>
-<a href="assignment-instructions/assignment-02/hw-02.html">Week 2</a>
+<a href="assignment-instructions/assignment-pet-names/hw-01-pet-names.html">Assignment 1</a>
+<a href="assignment-instructions/assignment-02/hw-02.html">Assignment 2</a>
+<a href="assignment-instructions/assignment-03/hw-03.html">Assignment 3</a>
+<a href="assignment-instructions/assignment-04/hw-04.html">Assignment 4</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -654,10 +658,13 @@ Labs
 <span class="down-arrow">&#x25BE;</span>
 </button>
 <div class="nav-dropdown-content">
-<a href="lab-instructions/lab-01/lab-01-hello-r.html">Week 1</a>
-<a href="lab-instructions/lab-02/lab-02-plastic-waste.html">Week 2</a>
+<a href="lab-instructions/lab-01/lab-01-hello-r.html">Lab Week 1</a>
+<a href="lab-instructions/lab-02/lab-02-plastic-waste.html">Lab Week 2</a>
+<a href="lab-instructions/lab-03/lab-03-nobel-laureates.html">Lab Week 3</a>
+<a href="lab-instructions/lab-04/lab-04.html">Lab Week 4</a>
 </div>
 </div>
+<a href="project-instructions/project.html">Project</a>
 <a href="acknowledgements.html">Acknowledgements</a>
 </div>
 <div class="nav-right">

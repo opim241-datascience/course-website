@@ -3,7 +3,7 @@ title: "OPIM 241"
 description: |
   McDonough School of Business - OPIM 241 - Spring 2021
 output_dir: "docs"
-inclue: ["slides", "lab-instructions", "assignment-instructions"]
+include: ["slides", "lab-instructions", "assignment-instructions", "project-instructions"]
 navbar:
   left:
     - text: "Home"
@@ -20,22 +20,30 @@ navbar:
           href: slides/02/Week2.html
         - text: "Week 3"
           href: slides/03/Week3.html
+        - text: "Week 4"
+          href: slides/04/Week4.html
     - text: "Assignments"
       menu:
-        - text: "Week 1"
+        - text: "Assignment 1"
           href: assignment-instructions/assignment-pet-names/hw-01-pet-names.html
-        - text: "Week 2"
+        - text: "Assignment 2"
           href: assignment-instructions/assignment-02/hw-02.html
-        - text: "Week 3"
+        - text: "Assignment 3"
           href: assignment-instructions/assignment-03/hw-03.html
+        - text: "Assignment 4"
+          href: assignment-instructions/assignment-04/hw-04.html
     - text: "Labs"
       menu:
-        - text: "Week 1"
+        - text: "Lab Week 1"
           href: lab-instructions/lab-01/lab-01-hello-r.html
-        - text: "Week 2"
+        - text: "Lab Week 2"
           href: lab-instructions/lab-02/lab-02-plastic-waste.html
-        - text: "Week 3"
+        - text: "Lab Week 3"
           href: lab-instructions/lab-03/lab-03-nobel-laureates.html
+        - text: "Lab Week 4"
+          href: lab-instructions/lab-04/lab-04.html
+    - text: "Project"
+      href: project-instructions/project.html
     - text: "Acknowledgements"
       href: acknowledgements.html
 output: distill::distill_article

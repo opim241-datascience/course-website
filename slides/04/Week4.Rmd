@@ -1,0 +1,33 @@
+---
+title: "Working with Data: More wrangling, joining, importing and recoding data"
+subtitle: "OPIM 241 - Data Science"  
+institution: "Georgetown University"
+author: "Marck Vaisman"
+date: "Spring 2021"
+---
+
+
+```{r child='../setup/setup-options.Rmd'}
+```
+
+
+```{r child='data-types.Rmd'}
+```
+
+---
+
+```{r child='data-classes.Rmd'}
+```
+
+---
+
+
+```{r child='data-import.Rmd'}
+```
+
+---
+
+```{r child='data-recode.Rmd'}
+```
+
+

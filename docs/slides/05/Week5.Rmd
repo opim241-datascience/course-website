@@ -1,0 +1,37 @@
+---
+title: "Modeling Data"
+subtitle: "OPIM 241 - Data Science"  
+institution: "Georgetown University"
+author: "Marck Vaisman"
+date: "Spring 2021"
+---
+
+
+```{r child='../setup/setup-options.Rmd'}
+```
+
+
+```{r child='language-of-models.Rmd'}
+```
+
+---
+
+```{r child='fitting-interpreting-models.Rmd'}
+```
+
+---
+
+
+```{r child='modeling-nonlinear-relationships.Rmd'}
+```
+
+---
+
+```{r child='model-multiple-predictors.Rmd'}
+```
+
+---
+
+```{r child='more-model-multiple-predictors.Rmd'}
+```
+

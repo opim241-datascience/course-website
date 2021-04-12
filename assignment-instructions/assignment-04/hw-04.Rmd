@@ -34,11 +34,14 @@ Keep this in mind as you analyze the data.
 
 # Getting started
 
-Go to the course GitHub organization and locate your homework repo, which should be named `hw-04-college-majors-YOUR_GITHUB_USERNAME`.
-Grab the URL of the repo, and clone it in RStudio.
-First, open the R Markdown document `hw-04.Rmd` and Knit it.
-Make sure it compiles without errors.
-The output will be in the file markdown `.md` file with the same name.
+# Getting started
+
+- [Click here to go the the Assignment in Canvas](https://georgetown.instructure.com/courses/126656/assignments/572751)
+- Click on the link inside the assignment to go to the acceptance page and accept the assignment. The name of the repository that will be created for you is `assignment-03-YOURGITHUBUSERNAME`:
+- Grab the URL of the repo, and clone it in RStudio.
+- First, open the R Markdown document `hw-03.Rmd` and Knit it.
+- Make sure it compiles without errors.
+- The output will be in the file markdown `.md` file with the same name.
 
 ## Warm up
 
