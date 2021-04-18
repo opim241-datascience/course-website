@@ -21,54 +21,53 @@ sched <-
 
 l01 <- tibble(
   topics = "Intro to Data Science. Toolkit: R, RStudio, git, GitHub",
-  lab = "",
+  lab = "Lab 1",
   reading = "",
   notes = ""
 )
 
 l02 <- tibble(
   topics = "Visualizing data",
-  lab = "",
+  lab = "Lab 2",
   reading = "R4DS: Ch. 2,3",
-  notes = ""
+  notes = "Assignment 1 due before class"
 )
 
 
 l03 <- tibble(
-  topics = "Importing, wrangling, recoding and tidying data",
-  lab = "",
-  reading = "R4DS: Ch.4,5,6,7,18,19.1-19.3",
-  notes = ""
+  topics = "Wrangling: manipulating and summarizing data",
+  lab = "Lab 3",
+  reading = "R4DS: Ch.4,5,6",
+  notes = "Assignment 2 due before class"
 )
 
 l04 <- tibble(
-  topics = "Communicating data science results effectively",
-  lab = "",
-  reading = "R4DS: Ch. 9",
-  notes = ""
-)
+  topics = "Wrangling: joining, recoding and reading data",
+  lab = "Lab 4",
+  reading = "R4DS: Ch. 7,18,19",
+  notes = "Assignment 3 due before class"
+    )
 
 l05 <- tibble(
   topics = "Modeling data: regression",
-  lab = "",
-  reading = "R4E: Ch. 19",
-  notes = ""
+  lab = "Lab 5",
+  reading = "",
+  notes = "Assignment 4 due before class"
 )
 
 l06 <- tibble(
-  topics = "Modeling data: classification. Model validation.",
-  lab = "",
-  reading = "R4E: 20.1, ",
-  notes = ""
+  topics = "Modeling data: classificatio and model validation",
+  lab = "Lab 6",
+  reading = "",
+  notes = "Assignment 5 due before class"
 )
 
 l07 <- tibble(
   topics = "Business Case Study",
-  lab = "",
+  lab = "Lab 7",
   reading = "",
-  notes = ""
+  notes = "Assignment 6 due before class"
 )
-
 
 sessions <- paste0("l", str_pad(as.character(1:7), 2, pad = "0"))
 

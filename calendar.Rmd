@@ -1,0 +1,20 @@
+---
+title: "Calendar"
+---
+
+This is the calendar for the course. All assignments will also be posted on Canvas.
+
+```{r, echo = FALSE} 
+source("schedule.R")
+sched %>%
+  knitr:::kable(., "html",
+                col.names = c("Class", "Date", "Topics", "Lab",
+                               "Reading", "Notes")
+  ) 
+```  
+
+All labs are due on Thursday after class.
+
+All assignments are due on Monday of the following week before class starts.
+
+The Project is due on **Thursday, May 13 2021.**

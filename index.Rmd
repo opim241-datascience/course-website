@@ -17,4 +17,4 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
-Welcome. This website is still work in progress. 
+Welcome. Please check this website weekly as new content is added every week.

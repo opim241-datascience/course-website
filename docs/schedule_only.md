@@ -636,6 +636,7 @@ Slides
 <a href="slides/02/Week2.html">Week 2</a>
 <a href="slides/03/Week3.html">Week 3</a>
 <a href="slides/04/Week4.html">Week 4</a>
+<a href="slides/05/Week5.html">Week 5</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -649,6 +650,7 @@ Assignments
 <a href="assignment-instructions/assignment-02/hw-02.html">Assignment 2</a>
 <a href="assignment-instructions/assignment-03/hw-03.html">Assignment 3</a>
 <a href="assignment-instructions/assignment-04/hw-04.html">Assignment 4</a>
+<a href="assignment-instructions/assignment-05/hw-05.html">Assignment 5</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -662,6 +664,8 @@ Labs
 <a href="lab-instructions/lab-02/lab-02-plastic-waste.html">Lab Week 2</a>
 <a href="lab-instructions/lab-03/lab-03-nobel-laureates.html">Lab Week 3</a>
 <a href="lab-instructions/lab-04/lab-04.html">Lab Week 4</a>
+<a href="lab-instructions/lab-05/lab-05.html">Lab Week 5</a>
+<a href="lab-instructions/github-collaboration/github-collaboration.html">GitHub Collaboratiojn</a>
 </div>
 </div>
 <a href="project-instructions/project.html">Project</a>
@@ -677,15 +681,15 @@ Labs
 <!--radix_placeholder_site_before_body-->
 <!--/radix_placeholder_site_before_body-->
 
-| Class | Date       | Topics                                                  | Lab | Reading                       | Notes |
-|------:|:-----------|:--------------------------------------------------------|:----|:------------------------------|:------|
-|     1 | Mon Mar-15 | Intro to Data Science. Toolkit: R, RStudio, git, GitHub |     |                               |       |
-|     2 | Mon Mar-22 | Visualizing data                                        |     | R4DS: Ch. 2,3                 |       |
-|     3 | Mon Apr-05 | Importing, wrangling, recoding and tidying data         |     | R4DS: Ch.4,5,6,7,18,19.1-19.3 |       |
-|     4 | Mon Apr-12 | Communicating data science results effectively          |     | R4DS: Ch. 9                   |       |
-|     5 | Mon Apr-19 | Modeling data: regression                               |     | R4E: Ch. 19                   |       |
-|     6 | Mon Apr-26 | Modeling data: classification. Model validation.        |     | R4E: 20.1,                    |       |
-|     7 | Mon May-03 | Business Case Study                                     |     |                               |       |
+| Class | Date       | Topics                                                  | Lab   | Reading           | Notes                         |
+|------:|:-----------|:--------------------------------------------------------|:------|:------------------|:------------------------------|
+|     1 | Mon Mar-15 | Intro to Data Science. Toolkit: R, RStudio, git, GitHub | Lab 1 |                   |                               |
+|     2 | Mon Mar-22 | Visualizing data                                        | Lab 2 | R4DS: Ch. 2,3     | Assignment 1 due before class |
+|     3 | Mon Apr-05 | Wrangling: manipulating and summarizing data            | Lab 3 | R4DS: Ch.4,5,6    | Assignment 2 due before class |
+|     4 | Mon Apr-12 | Wrangling: joining, recoding and reading data           | Lab 4 | R4DS: Ch. 7,18,19 | Assignment 3 due before class |
+|     5 | Mon Apr-19 | Modeling data: regression                               | Lab 5 |                   | Assignment 4 due before class |
+|     6 | Mon Apr-26 | Modeling data: classificatio and model validation       | Lab 6 |                   | Assignment 5 due before class |
+|     7 | Mon May-03 | Business Case Study                                     | Lab 7 |                   | Assignment 6 due before class |
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->

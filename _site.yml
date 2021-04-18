@@ -22,6 +22,8 @@ navbar:
           href: slides/03/Week3.html
         - text: "Week 4"
           href: slides/04/Week4.html
+        - text: "Week 5"
+          href: slides/05/Week5.html
     - text: "Assignments"
       menu:
         - text: "Assignment 1"
@@ -32,6 +34,8 @@ navbar:
           href: assignment-instructions/assignment-03/hw-03.html
         - text: "Assignment 4"
           href: assignment-instructions/assignment-04/hw-04.html
+        - text: "Assignment 5"
+          href: assignment-instructions/assignment-05/hw-05.html
     - text: "Labs"
       menu:
         - text: "Lab Week 1"
@@ -42,6 +46,10 @@ navbar:
           href: lab-instructions/lab-03/lab-03-nobel-laureates.html
         - text: "Lab Week 4"
           href: lab-instructions/lab-04/lab-04.html
+        - text: "Lab Week 5"
+          href: lab-instructions/lab-05/lab-05.html
+        - text: "GitHub Collaboratiojn"
+          href: lab-instructions/github-collaboration/github-collaboration.html
     - text: "Project"
       href: project-instructions/project.html
     - text: "Acknowledgements"
