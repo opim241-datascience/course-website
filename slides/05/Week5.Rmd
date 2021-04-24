@@ -4,6 +4,16 @@ subtitle: "OPIM 241 - Data Science"
 institution: "Georgetown University"
 author: "Marck Vaisman"
 date: "Spring 2021"
+output:
+  xaringan::moon_reader:
+    self_contained: false
+    css: ["../setup/bigdata.css"]
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
 ---
 
 

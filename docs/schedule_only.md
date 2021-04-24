@@ -637,6 +637,8 @@ Slides
 <a href="slides/03/Week3.html">Week 3</a>
 <a href="slides/04/Week4.html">Week 4</a>
 <a href="slides/05/Week5.html">Week 5</a>
+<a href="slides/06/Week6.html">Week 6</a>
+<a href="slides/07/Week7.html">Week 7</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -651,6 +653,7 @@ Assignments
 <a href="assignment-instructions/assignment-03/hw-03.html">Assignment 3</a>
 <a href="assignment-instructions/assignment-04/hw-04.html">Assignment 4</a>
 <a href="assignment-instructions/assignment-05/hw-05.html">Assignment 5</a>
+<a href="assignment-instructions/assignment-06/hw-06.html">Assignment 6</a>
 </div>
 </div>
 <div class="nav-dropdown">
@@ -665,6 +668,8 @@ Labs
 <a href="lab-instructions/lab-03/lab-03-nobel-laureates.html">Lab Week 3</a>
 <a href="lab-instructions/lab-04/lab-04.html">Lab Week 4</a>
 <a href="lab-instructions/lab-05/lab-05.html">Lab Week 5</a>
+<a href="lab-instructions/lab-06/lab-06.html">Lab Week 6</a>
+<a href="lab-instructions/lab-07/lab-07.html">Lab Week 7</a>
 <a href="lab-instructions/github-collaboration/github-collaboration.html">GitHub Collaboratiojn</a>
 </div>
 </div>

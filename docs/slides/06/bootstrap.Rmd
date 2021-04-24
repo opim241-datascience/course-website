@@ -13,9 +13,6 @@ set.seed(1234)
 elmhurst_boot <- bootstraps(elmhurst, times = 1000)
 ```
 
-class: middle, center
-
-# Rent in Edinburgh
 
 ---
 

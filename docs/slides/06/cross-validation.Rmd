@@ -15,7 +15,7 @@ set.seed(1234)
 
 class: middle
 
-# Data and exploration
+## Data and exploration
 
 ---
 

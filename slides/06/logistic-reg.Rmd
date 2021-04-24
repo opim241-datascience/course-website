@@ -32,6 +32,19 @@ glimpse(email)
 
 ---
 
+We saw `spam` (the outcome) is numeric. Should we leave it as is?
+
+--
+
+```{r}
+email <- 
+  email %>% 
+  mutate(spam = factor(spam))
+```
+
+---
+
+
 .question[
 Would you expect longer or shorter emails to be spam?
 ]
@@ -103,7 +116,8 @@ means <- email %>%
   summarise(mean_num_char = mean(num_char)) %>%
   mutate(group = 1)
 
-ggplot(email, aes(x = num_char, y = spam, color = spam)) +
+ggplot(email, 
+       aes(x = num_char, y = spam, color = spam)) +
   geom_jitter(alpha = 0.2) +
   geom_line(data = means, aes(x = mean_num_char, y = spam, group = group), color = "black", size = 1.5) +
   labs(x = "Number of characters (in thousands)", y = "Spam") +

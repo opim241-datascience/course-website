@@ -20,12 +20,6 @@ options(
 
 ---
 
-class: middle, center
-
-# Prediction
-
----
-
 ## Goal: Building a spam filter
 
 - Data: Set of emails and we know if each email is spam/not and other features 

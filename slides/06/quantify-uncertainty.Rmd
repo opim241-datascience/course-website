@@ -18,7 +18,7 @@ elmhurst_boot <- bootstraps(elmhurst, times = 1000)
 
 class: middle, center
 
-# Recap and motivation
+## Recap and motivation
 
 ---
 

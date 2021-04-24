@@ -1,0 +1,3056 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Modeling Data: classification, model performance</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Marck Vaisman" />
+    <script src="Week6_files/header-attrs/header-attrs.js"></script>
+    <link href="Week6_files/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="Week6_files/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link href="Week6_files/panelset/panelset.css" rel="stylesheet" />
+    <script src="Week6_files/panelset/panelset.js"></script>
+    <link href="Week6_files/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../setup/bigdata.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Modeling Data: classification, model performance
+## OPIM 241 - Data Science
+### Marck Vaisman
+### Spring 2021
+
+---
+
+
+
+
+
+
+
+
+
+class: middle, center, inverse
+
+# Logistic Regression - Predicting categorical data
+
+
+
+
+---
+
+
+## Spam filters
+
+.pull-left-narrow[
+- Data from 3921 emails and 21 variables on them
+- Outcome: whether the email is spam or not
+- Predictors: number of characters, whether the email had "Re:" in the subject, time at which email was sent, number of times the word "inherit" shows up in the email, etc.
+]
+.pull-right-wide[
+.small[
+
+```r
+library(openintro)
+glimpse(email)
+```
+
+```
+## Rows: 3,921
+## Columns: 21
+## $ spam         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ to_multiple  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, …
+## $ from         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ cc           &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, …
+## $ sent_email   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, …
+## $ time         &lt;dttm&gt; 2012-01-01 01:16:41, 2012-01-01 02:03:59,…
+## $ image        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, …
+## $ attach       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, …
+## $ dollar       &lt;dbl&gt; 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ winner       &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no…
+## $ inherit      &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ viagra       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ password     &lt;dbl&gt; 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ num_char     &lt;dbl&gt; 11.370, 10.504, 7.773, 13.256, 1.231, 1.09…
+## $ line_breaks  &lt;int&gt; 202, 202, 192, 255, 29, 25, 193, 237, 69, …
+## $ format       &lt;dbl&gt; 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, …
+## $ re_subj      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, …
+## $ exclaim_subj &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ urgent_subj  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ exclaim_mess &lt;dbl&gt; 0, 1, 6, 48, 1, 1, 1, 18, 1, 0, 2, 1, 0, 1…
+## $ number       &lt;fct&gt; big, small, small, small, none, none, big,…
+```
+]
+]
+
+---
+
+We saw `spam` (the outcome) is numeric. Should we leave it as is?
+
+--
+
+
+```r
+email &lt;- 
+  email %&gt;% 
+  mutate(spam = factor(spam))
+```
+
+---
+
+
+.question[
+Would you expect longer or shorter emails to be spam?
+]
+
+--
+
+.pull-left[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-10-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+
+```
+## # A tibble: 2 x 2
+##   spam  mean_num_char
+##   &lt;fct&gt;         &lt;dbl&gt;
+## 1 0             11.3 
+## 2 1              5.44
+```
+]
+
+---
+
+.question[
+Would you expect emails that have subjects starting with "Re:", "RE:", "re:", or "rE:" to be spam or not?
+]
+
+--
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-12-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Modelling spam
+
+- Both number of characters and whether the message has "re:" in the subject might be related to whether the email is spam. How do we come up with a model that will let us explore this relationship?
+
+--
+- For simplicity, we'll focus on the number of characters (`num_char`) as predictor, but the model we describe can be expanded to take multiple predictors as well.
+
+---
+
+## Modelling spam
+
+This isn't something we can reasonably fit a linear model to -- we need something different!
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Framing the problem
+
+- We can treat each outcome (spam and not) as successes and failures arising from separate Bernoulli trials
+  - Bernoulli trial: a random experiment with exactly two possible outcomes, "success" and "failure", in which the probability of success is the same every time the experiment is conducted
+
+--
+- Each Bernoulli trial can have a separate probability of success
+
+$$ y_i ∼ Bern(p) $$
+
+--
+- We can then use the predictor variables to model that probability of success, `\(p_i\)`
+
+--
+- We can't just use a linear model for `\(p_i\)` (since `\(p_i\)` must be between 0 and 1) but we can transform the linear model to have the appropriate range
+
+---
+
+## Generalized linear models
+
+- This is a very general way of addressing many problems in regression and the resulting models are called **generalized linear models (GLMs)**
+
+--
+- Logistic regression is just one example
+
+---
+
+## Three characteristics of GLMs
+
+All GLMs have the following three characteristics:
+
+1. A probability distribution describing a generative model for the outcome variable
+
+--
+2. A linear model:
+`$$\eta = \beta_0 + \beta_1 X_1 + \cdots + \beta_k X_k$$`
+
+--
+3. A link function that relates the linear model to the parameter of the outcome distribution
+  
+---
+
+class: middle
+
+# Logistic regression
+
+---
+
+## Logistic regression
+
+- Logistic regression is a GLM used to model a binary categorical outcome using numerical and categorical predictors
+
+--
+- To finish specifying the Logistic model we just need to define a reasonable link function that connects `\(\eta_i\)` to `\(p_i\)`: logit function
+
+--
+- **Logit function:** For `\(0\le p \le 1\)`
+
+`$$logit(p) = \log\left(\frac{p}{1-p}\right)$$`
+
+
+
+---
+
+## Logit function, visualised
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-14-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Properties of the logit
+
+- The logit function takes a value between 0 and 1 and maps it to a value between `\(-\infty\)` and `\(\infty\)`
+
+--
+- Inverse logit (logistic) function:
+`$$g^{-1}(x) = \frac{\exp(x)}{1+\exp(x)} = \frac{1}{1+\exp(-x)}$$`
+
+--
+- The inverse logit function takes a value between `\(-\infty\)` and `\(\infty\)` and maps it to a value between 0 and 1
+
+--
+- This formulation is also useful for interpreting the model, since the logit can be interpreted as the log odds of a success -- more on this later
+
+---
+
+## The logistic regression model
+
+- Based on the three GLM criteria we have
+  - `\(y_i \sim \text{Bern}(p_i)\)`
+  - `\(\eta_i = \beta_0+\beta_1 x_{1,i} + \cdots + \beta_n x_{n,i}\)`
+  - `\(\text{logit}(p_i) = \eta_i\)`
+
+--
+- From which we get
+
+`$$p_i = \frac{\exp(\beta_0+\beta_1 x_{1,i} + \cdots + \beta_k x_{k,i})}{1+\exp(\beta_0+\beta_1 x_{1,i} + \cdots + \beta_k x_{k,i})}$$`
+---
+
+## Modeling spam
+
+In R we fit a GLM in the same way as a linear model except we
+
+- specify the model with `logistic_reg()`
+- use `"glm"` instead of `"lm"` as the engine 
+- define `family = "binomial"` for the link function to be used in the model
+
+--
+
+
+```r
+spam_fit &lt;- logistic_reg() %&gt;%
+  set_engine("glm") %&gt;%
+  fit(spam ~ num_char, data = email, family = "binomial")
+
+tidy(spam_fit)
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)  -1.80     0.0716     -25.1  2.04e-139
+## 2 num_char     -0.0621   0.00801     -7.75 9.50e- 15
+```
+
+---
+
+## Spam model
+
+
+```r
+tidy(spam_fit)
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)  -1.80     0.0716     -25.1  2.04e-139
+## 2 num_char     -0.0621   0.00801     -7.75 9.50e- 15
+```
+
+--
+
+Model:
+`$$\log\left(\frac{p}{1-p}\right) = -1.80-0.0621\times \text{num_char}$$`
+
+---
+
+## P(spam) for an email with 2000 characters 
+
+`$$\log\left(\frac{p}{1-p}\right) = -1.80-0.0621\times 2$$`
+--
+`$$\frac{p}{1-p} = \exp(-1.9242) = 0.15 \rightarrow p = 0.15 \times (1 - p)$$`
+--
+`$$p = 0.15 - 0.15p \rightarrow 1.15p = 0.15$$`
+--
+`$$p = 0.15 / 1.15 = 0.13$$`
+
+---
+
+.question[
+What is the probability that an email with 15000 characters is spam? What about an email with 40000 characters?
+]
+
+--
+
+.pull-left[
+&lt;img src="Week6_files/figure-html/spam-predict-viz-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+- .light-blue[2K chars: P(spam) = 0.13]
+- .yellow[15K chars, P(spam) = 0.06]
+- .green[40K chars, P(spam) = 0.01]
+]
+
+---
+
+.question[
+Would you prefer an email with 2000 characters to be labelled as spam or not? How about 40,000 characters?
+]
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-17-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle
+
+# Sensitivity and specificity
+
+---
+
+## False positive and negative
+
+|                         | Email is spam                 | Email is not spam             |
+|-------------------------|-------------------------------|-------------------------------|
+| Email labelled spam     | True positive                 | False positive (Type 1 error) |
+| Email labelled not spam | False negative (Type 2 error) | True negative                 |
+
+--
+- False negative rate = P(Labelled not spam | Email spam) = FN / (TP + FN) 
+
+- False positive rate = P(Labelled spam | Email not spam) = FP / (FP + TN)
+
+---
+
+## Sensitivity and specificity
+
+|                         | Email is spam                 | Email is not spam             |
+|-------------------------|-------------------------------|-------------------------------|
+| Email labelled spam     | True positive                 | False positive (Type 1 error) |
+| Email labelled not spam | False negative (Type 2 error) | True negative                 |
+
+--
+
+- Sensitivity = P(Labelled spam | Email spam) = TP / (TP + FN)
+  - Sensitivity = 1 − False negative rate
+  
+- Specificity = P(Labelled not spam | Email not spam) = TN / (FP + TN) 
+  - Specificity = 1 − False positive rate
+
+---
+
+.question[
+If you were designing a spam filter, would you want sensitivity and specificity to be high or low? What are the trade-offs associated with each decision? 
+]
+
+---
+
+
+class: inverse, middle, center
+
+# Prediction and overfitting
+
+
+
+
+---
+
+## Goal: Building a spam filter
+
+- Data: Set of emails and we know if each email is spam/not and other features 
+- Use logistic regression to predict the probability that an incoming email is spam
+- Use model selection to pick the model with the best predictive performance
+
+--
+- Building a model to predict the probability that an email is spam is only half of the battle! We also need a decision rule about which emails get flagged as spam (e.g. what probability should we use as out cutoff?)
+
+--
+- A simple approach: choose a single threshold probability and any email that exceeds that probability is flagged as spam
+
+---
+
+## A multiple regression approach
+
+.panelset[
+.panel[.panel-name[Output]
+.small[
+
+```
+## # A tibble: 22 x 5
+##    term         estimate std.error statistic  p.value
+##    &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1 (Intercept)  -9.09e+1   9.80e+3  -0.00928 9.93e- 1
+##  2 to_multiple  -2.68e+0   3.27e-1  -8.21    2.25e-16
+##  3 from         -2.19e+1   9.80e+3  -0.00224 9.98e- 1
+##  4 cc            1.88e-2   2.20e-2   0.855   3.93e- 1
+##  5 sent_email   -2.07e+1   3.87e+2  -0.0536  9.57e- 1
+##  6 time          8.48e-8   2.85e-8   2.98    2.92e- 3
+##  7 image        -1.78e+0   5.95e-1  -3.00    2.73e- 3
+##  8 attach        7.35e-1   1.44e-1   5.09    3.61e- 7
+##  9 dollar       -6.85e-2   2.64e-2  -2.59    9.64e- 3
+## 10 winneryes     2.07e+0   3.65e-1   5.67    1.41e- 8
+## 11 inherit       3.15e-1   1.56e-1   2.02    4.32e- 2
+## 12 viagra        2.84e+0   2.22e+3   0.00128 9.99e- 1
+## 13 password     -8.54e-1   2.97e-1  -2.88    4.03e- 3
+## 14 num_char      5.06e-2   2.38e-2   2.13    3.35e- 2
+## 15 line_breaks  -5.49e-3   1.35e-3  -4.06    4.91e- 5
+## 16 format       -6.14e-1   1.49e-1  -4.14    3.53e- 5
+## 17 re_subj      -1.64e+0   3.86e-1  -4.25    2.16e- 5
+## 18 exclaim_subj  1.42e-1   2.43e-1   0.585   5.58e- 1
+## 19 urgent_subj   3.88e+0   1.32e+0   2.95    3.18e- 3
+## 20 exclaim_mess  1.08e-2   1.81e-3   5.98    2.23e- 9
+## 21 numbersmall  -1.19e+0   1.54e-1  -7.74    9.62e-15
+## 22 numberbig    -2.95e-1   2.20e-1  -1.34    1.79e- 1
+```
+]
+]
+.panel[.panel-name[Code]
+
+```r
+logistic_reg() %&gt;%
+  set_engine("glm") %&gt;%
+  fit(spam ~ ., data = email, family = "binomial") %&gt;%
+  tidy() %&gt;%
+  print(n = 22)
+```
+
+```
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+```
+]
+]
+
+---
+
+## Prediction
+
+- The mechanics of prediction is **easy**:
+  - Plug in values of predictors to the model equation
+  - Calculate the predicted value of the response variable, `\(\hat{y}\)`
+
+--
+- Getting it right is **hard**!
+  - There is no guarantee the model estimates you have are correct
+  - Or that your model will perform as well with new data as it did with your sample data
+
+---
+
+## Underfitting and overfitting
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-19-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Spending our data
+
+- Several steps to create a useful model: parameter estimation, model selection, performance assessment, etc.
+
+- Doing all of this on the entire data we have available can lead to **overfitting**
+
+- Allocate specific subsets of data for different tasks, as opposed to allocating the largest possible amount to the model parameter estimation only (which is what we've done so far)
+
+---
+
+class: middle
+
+# Splitting data
+
+---
+
+## Splitting data
+
+- **Training set:**
+  - Sandbox for model building 
+  - Spend most of your time using the training set to develop the model
+  - Majority of the data (usually 80%)
+  
+- **Testing set:**
+  - Held in reserve to determine efficacy of one or two chosen models
+  - Critical to look at it once, otherwise it becomes part of the modeling process
+  - Remainder of the data (usually 20%)
+  
+---
+
+## Performing the split
+
+
+```r
+# Fix random numbers by setting the seed 
+# Enables analysis to be reproducible when random numbers are used 
+set.seed(1116)
+
+# Put 80% of the data into the training set 
+email_split &lt;- initial_split(email, prop = 0.80)
+
+# Create data frames for the two sets:
+train_data &lt;- training(email_split)
+test_data  &lt;- testing(email_split)
+```
+
+---
+
+## Peek at the split
+
+.small[
+.pull-left[
+
+```r
+glimpse(train_data)
+```
+
+```
+## Rows: 3,137
+## Columns: 21
+## $ spam         &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ to_multiple  &lt;dbl&gt; 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, …
+## $ from         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ cc           &lt;int&gt; 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 2, 1, 0, …
+## $ sent_email   &lt;dbl&gt; 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, …
+## $ time         &lt;dttm&gt; 2012-01-01 01:16:41, 2012-01-01 02:03:59,…
+## $ image        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
+## $ attach       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
+## $ dollar       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 5, …
+## $ winner       &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no…
+## $ inherit      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ viagra       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ password     &lt;dbl&gt; 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, …
+## $ num_char     &lt;dbl&gt; 11.370, 10.504, 13.256, 1.231, 1.091, 4.83…
+## $ line_breaks  &lt;int&gt; 202, 202, 255, 29, 25, 193, 237, 69, 79, 1…
+## $ format       &lt;dbl&gt; 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, …
+## $ re_subj      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, …
+## $ exclaim_subj &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, …
+## $ urgent_subj  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ exclaim_mess &lt;dbl&gt; 0, 1, 48, 1, 1, 1, 18, 1, 1, 0, 10, 4, 10,…
+## $ number       &lt;fct&gt; big, small, small, none, none, big, small,…
+```
+]
+.pull-right[
+
+```r
+glimpse(test_data)
+```
+
+```
+## Rows: 784
+## Columns: 21
+## $ spam         &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ to_multiple  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, …
+## $ from         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ cc           &lt;int&gt; 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 7, 0, 0, …
+## $ sent_email   &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
+## $ time         &lt;dttm&gt; 2012-01-01 11:00:32, 2012-01-01 13:12:00,…
+## $ image        &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ attach       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ dollar       &lt;dbl&gt; 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, …
+## $ winner       &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no…
+## $ inherit      &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ viagra       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ password     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ num_char     &lt;dbl&gt; 7.773, 2.643, 0.869, 13.890, 4.560, 2.192,…
+## $ line_breaks  &lt;int&gt; 192, 68, 25, 225, 64, 85, 10, 57, 97, 39, …
+## $ format       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, …
+## $ re_subj      &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, …
+## $ exclaim_subj &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, …
+## $ urgent_subj  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+## $ exclaim_mess &lt;dbl&gt; 6, 0, 2, 0, 0, 3, 0, 5, 1, 3, 3, 0, 4, 32,…
+## $ number       &lt;fct&gt; small, small, small, small, none, big, sma…
+```
+]
+]
+
+---
+
+class: middle
+
+# Modeling workflow
+
+---
+
+## Fit a model to the training dataset
+
+
+```r
+email_fit &lt;- logistic_reg() %&gt;%
+  set_engine("glm") %&gt;%
+  fit(spam ~ ., data = train_data, family = "binomial")
+```
+
+```
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+```
+
+---
+
+## Categorical predictors
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-24-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## `from` and `sent_email`
+
+.pull-left[
+- `from`: Whether the message was listed as from anyone (this is usually set by default for regular outgoing email)
+
+
+```r
+train_data %&gt;%
+  count(spam, from)
+```
+
+```
+## # A tibble: 3 x 3
+##   spam   from     n
+##   &lt;fct&gt; &lt;dbl&gt; &lt;int&gt;
+## 1 0         1  2847
+## 2 1         0     3
+## 3 1         1   287
+```
+]
+.pull-right[
+- `sent_email`: Indicator for whether the sender had been sent an email in the last 30 days
+
+
+```r
+train_data %&gt;%
+  count(spam, sent_email)
+```
+
+```
+## # A tibble: 3 x 3
+##   spam  sent_email     n
+##   &lt;fct&gt;      &lt;dbl&gt; &lt;int&gt;
+## 1 0              0  1962
+## 2 0              1   885
+## 3 1              0   290
+```
+]
+
+---
+
+## Numerical predictors
+
+.small[
+
+```
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────
+##    skim_variable spam  n_missing complete_rate      mean       sd    p0    p25    p50    p75  p100
+##  1 to_multiple   0             0             1   0.171     0.377  0      0       0      0       1 
+##  2 to_multiple   1             0             1   0.0207    0.143  0      0       0      0       1 
+##  3 from          0             0             1   1         0      1      1       1      1       1 
+##  4 from          1             0             1   0.990     0.101  0      1       1      1       1 
+##  5 cc            0             0             1   0.416     2.77   0      0       0      0      68 
+##  6 cc            1             0             1   0.345     2.02   0      0       0      0      23 
+##  7 sent_email    0             0             1   0.311     0.463  0      0       0      1       1 
+##  8 sent_email    1             0             1   0         0      0      0       0      0       0 
+##  9 image         0             0             1   0.0562    0.510  0      0       0      0      20 
+## 10 image         1             0             1   0.00690   0.0829 0      0       0      0       1 
+*## 11 attach        0             0             1   0.128     0.765  0      0       0      0      21 
+*## 12 attach        1             0             1   0.193     0.574  0      0       0      0       2 
+## 13 dollar        0             0             1   1.54      5.19   0      0       0      0      64 
+## 14 dollar        1             0             1   0.655     2.63   0      0       0      0      36 
+## 15 inherit       0             0             1   0.0351    0.237  0      0       0      0       6 
+## 16 inherit       1             0             1   0.0690    0.560  0      0       0      0       9 
+## 17 viagra        0             0             1   0         0      0      0       0      0       0 
+## 18 viagra        1             0             1   0         0      0      0       0      0       0 
+## 19 password      0             0             1   0.126     1.09   0      0       0      0      28 
+## 20 password      1             0             1   0.0138    0.143  0      0       0      0       2 
+## 21 num_char      0             0             1  11.2      14.3    0.003  1.86    6.83  15.4   165.
+## 22 num_char      1             0             1   4.60     13.0    0.001  0.503   1.08   3.20  174.
+## 23 line_breaks   0             0             1 244.      317.     2     42     136    320.   3589 
+## 24 line_breaks   1             0             1  88.8     265.     1     14      22.5   63.8  3729 
+## 25 format        0             0             1   0.724     0.447  0      0       1      1       1 
+## 26 format        1             0             1   0.434     0.497  0      0       0      1       1 
+## 27 re_subj       0             0             1   0.289     0.453  0      0       0      1       1 
+## 28 re_subj       1             0             1   0.0207    0.143  0      0       0      0       1 
+## 29 exclaim_subj  0             0             1   0.0780    0.268  0      0       0      0       1 
+## 30 exclaim_subj  1             0             1   0.0862    0.281  0      0       0      0       1 
+## 31 urgent_subj   0             0             1   0.00105   0.0324 0      0       0      0       1 
+## 32 urgent_subj   1             0             1   0.0103    0.101  0      0       0      0       1 
+## 33 exclaim_mess  0             0             1   6.02     41.2    0      0       1      5    1203 
+## 34 exclaim_mess  1             0             1   5.65     71.1    0      0       0      1    1209
+```
+]
+
+---
+
+## Fit a model to the training dataset
+
+
+```r
+email_fit &lt;- logistic_reg() %&gt;%
+  set_engine("glm") %&gt;%
+* fit(spam ~ . - from - sent_email - viagra, data = train_data, family = "binomial")
+```
+
+.small[
+
+```r
+email_fit
+```
+
+```
+## parsnip model object
+## 
+## Fit time:  23ms 
+## 
+## Call:  stats::glm(formula = spam ~ . - from - sent_email - viagra, family = stats::binomial, 
+##     data = data)
+## 
+## Coefficients:
+##  (Intercept)   to_multiple            cc          time         image        attach        dollar  
+##   -8.251e+01    -3.114e+00     2.130e-02     6.173e-08    -1.412e+00     3.871e-01    -7.115e-02  
+##    winneryes       inherit      password      num_char   line_breaks        format       re_subj  
+##    2.134e+00     3.569e-01    -9.737e-01     5.793e-02    -6.367e-03    -7.715e-01    -3.050e+00  
+## exclaim_subj   urgent_subj  exclaim_mess   numbersmall     numberbig  
+##    2.350e-01     3.866e+00     1.200e-02    -6.915e-01     1.174e-01  
+## 
+## Degrees of Freedom: 3136 Total (i.e. Null);  3118 Residual
+## Null Deviance:	    1933 
+## Residual Deviance: 1402 	AIC: 1440
+```
+]
+
+---
+
+## Predict outcome on the testing dataset
+
+
+```r
+predict(email_fit, test_data)
+```
+
+```
+## # A tibble: 784 x 1
+##   .pred_class
+##   &lt;fct&gt;      
+## 1 0          
+## 2 0          
+## 3 0          
+## 4 0          
+## 5 0          
+## 6 0          
+## # … with 778 more rows
+```
+
+
+---
+
+## Predict probabilities on the testing dataset
+
+
+```r
+email_pred &lt;- predict(email_fit, test_data, type = "prob") %&gt;%
+  bind_cols(test_data %&gt;% select(spam, time))
+
+email_pred
+```
+
+```
+## # A tibble: 784 x 4
+##   .pred_0 .pred_1 spam  time               
+##     &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt; &lt;dttm&gt;             
+## 1   0.942 0.0581  0     2012-01-01 11:00:32
+## 2   0.920 0.0804  0     2012-01-01 13:12:00
+## 3   0.904 0.0960  0     2012-01-01 13:23:44
+## 4   0.997 0.00304 0     2012-01-01 19:54:46
+## 5   0.833 0.167   0     2012-01-01 20:58:14
+## 6   0.849 0.151   0     2012-01-01 21:05:45
+## # … with 778 more rows
+```
+
+---
+
+## A closer look at predictions
+
+.pull-left-wide[
+
+```r
+email_pred %&gt;%
+  arrange(desc(.pred_1)) %&gt;%
+  print(n = 10)
+```
+
+```
+## # A tibble: 784 x 4
+##    .pred_0 .pred_1 spam  time               
+##      &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt; &lt;dttm&gt;             
+##  1  0.0381   0.962 1     2012-03-27 01:17:01
+##  2  0.205    0.795 1     2012-02-21 03:34:56
+*##  3  0.408    0.592 0     2012-02-03 08:25:39
+##  4  0.412    0.588 1     2012-03-10 17:43:58
+##  5  0.448    0.552 1     2012-02-14 14:45:19
+##  6  0.462    0.538 1     2012-02-04 10:54:23
+*##  7  0.469    0.531 0     2012-01-11 21:00:16
+##  8  0.472    0.528 1     2012-01-25 11:17:54
+##  9  0.477    0.523 1     2012-03-20 22:00:30
+## 10  0.486    0.514 1     2012-03-16 17:39:28
+## # … with 774 more rows
+```
+]
+
+---
+
+## Evaluate the performance
+
+**Receiver operating characteristic (ROC) curve**&lt;sup&gt;+&lt;/sup&gt; which plot true positive rate vs. false positive rate (1 - specificity)
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_curve(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  ) %&gt;%
+  autoplot()
+```
+]
+.pull-right[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.footnote[
+.small[
+&lt;sup&gt;+&lt;/sup&gt;Originally developed for operators of military radar receivers, hence the name.
+]
+]
+
+---
+
+## Evaluate the performance
+
+Find the area under the curve:
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_auc(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  )
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.828
+```
+]
+.pull-right[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-35-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+
+
+class: middle, center, inverse
+
+# Feature engineering
+
+
+
+
+
+
+
+
+---
+
+## Feature engineering
+
+- We prefer simple models when possible, but **parsimony** does not mean sacrificing accuracy (or predictive performance) in the interest of simplicity
+
+--
+- Variables that go into the model and how they are represented are just as critical to success of the model
+
+--
+- **Feature engineering** allows us to get creative with our predictors in an effort to make them more useful for our model (to increase its predictive performance) 
+
+---
+
+## Same training and testing sets as before
+
+
+```r
+# Fix random numbers by setting the seed 
+# Enables analysis to be reproducible when random numbers are used 
+set.seed(1116)
+
+# Put 80% of the data into the training set 
+email_split &lt;- initial_split(email, prop = 0.80)
+
+# Create data frames for the two sets:
+train_data &lt;- training(email_split)
+test_data  &lt;- testing(email_split)
+```
+
+---
+
+## A simple approach: `mutate()`
+
+
+```r
+train_data %&gt;%
+  mutate(
+    date = date(time),
+    dow  = wday(time),
+    month = month(time)
+    ) %&gt;%
+  select(time, date, dow, month) %&gt;%
+  sample_n(size = 5) # shuffle to show a variety
+```
+
+```
+## # A tibble: 5 x 4
+##   time                date         dow month
+##   &lt;dttm&gt;              &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt;
+## 1 2012-03-18 12:47:58 2012-03-18     1     3
+## 2 2012-02-07 23:50:43 2012-02-07     3     2
+## 3 2012-03-16 11:06:21 2012-03-16     6     3
+## 4 2012-02-26 00:37:38 2012-02-26     1     2
+## 5 2012-01-21 10:08:13 2012-01-21     7     1
+```
+
+---
+
+## Modeling workflow, revisited
+
+- Create a **recipe** for feature engineering steps to be applied to the training data
+
+--
+- Fit the model to the training data after these steps have been applied
+
+--
+- Using the model estimates from the training data, predict outcomes for the test data
+
+--
+- Evaluate the performance of the model on the test data
+
+---
+
+class: middle
+
+# Building recipes
+
+---
+
+## Initiate a recipe
+
+
+```r
+email_rec &lt;- recipe(
+  spam ~ .,          # formula
+  data = train_data  # data to use for cataloguing names and types of variables
+  )
+
+summary(email_rec)
+```
+
+.xsmall[
+
+```
+## # A tibble: 21 x 4
+##    variable     type    role      source  
+##    &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;   
+##  1 to_multiple  numeric predictor original
+##  2 from         numeric predictor original
+##  3 cc           numeric predictor original
+##  4 sent_email   numeric predictor original
+##  5 time         date    predictor original
+##  6 image        numeric predictor original
+##  7 attach       numeric predictor original
+##  8 dollar       numeric predictor original
+##  9 winner       nominal predictor original
+## 10 inherit      numeric predictor original
+## 11 viagra       numeric predictor original
+## 12 password     numeric predictor original
+## 13 num_char     numeric predictor original
+## 14 line_breaks  numeric predictor original
+## 15 format       numeric predictor original
+## 16 re_subj      numeric predictor original
+## 17 exclaim_subj numeric predictor original
+## 18 urgent_subj  numeric predictor original
+## 19 exclaim_mess numeric predictor original
+## 20 number       nominal predictor original
+## 21 spam         nominal outcome   original
+```
+]
+
+---
+
+## Remove certain variables
+
+
+```r
+email_rec &lt;- email_rec %&gt;%
+  step_rm(from, sent_email)
+```
+
+.small[
+
+```
+## Data Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##    outcome          1
+##  predictor         20
+## 
+## Operations:
+## 
+## Delete terms from, sent_email
+```
+]
+
+---
+
+## Feature engineer date
+
+
+```r
+email_rec &lt;- email_rec %&gt;%
+  step_date(time, features = c("dow", "month")) %&gt;%
+  step_rm(time)
+```
+
+.small[
+
+```
+## Data Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##    outcome          1
+##  predictor         20
+## 
+## Operations:
+## 
+## Delete terms from, sent_email
+## Date features from time
+## Delete terms time
+```
+]
+
+---
+
+## Discretize numeric variables
+
+
+```r
+email_rec &lt;- email_rec %&gt;%
+  step_cut(cc, attach, dollar, breaks = c(0, 1)) %&gt;%
+  step_cut(inherit, password, breaks = c(0, 1, 5, 10, 20))
+```
+
+.small[
+
+```
+## Data Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##    outcome          1
+##  predictor         20
+## 
+## Operations:
+## 
+## Delete terms from, sent_email
+## Date features from time
+## Delete terms time
+## Cut numeric for cc, attach, dollar
+## Cut numeric for inherit, password
+```
+]
+
+---
+
+## Create dummy variables
+
+
+```r
+email_rec &lt;- email_rec %&gt;%
+  step_dummy(all_nominal(), -all_outcomes())
+```
+
+.small[
+
+```
+## Data Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##    outcome          1
+##  predictor         20
+## 
+## Operations:
+## 
+## Delete terms from, sent_email
+## Date features from time
+## Delete terms time
+## Cut numeric for cc, attach, dollar
+## Cut numeric for inherit, password
+## Dummy variables from all_nominal(), -all_outcomes()
+```
+]
+
+---
+
+## Remove zero variance variables
+
+Variables that contain only a single value
+
+
+```r
+email_rec &lt;- email_rec %&gt;%
+  step_zv(all_predictors())
+```
+
+.small[
+
+```
+## Data Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##    outcome          1
+##  predictor         20
+## 
+## Operations:
+## 
+## Delete terms from, sent_email
+## Date features from time
+## Delete terms time
+## Cut numeric for cc, attach, dollar
+## Cut numeric for inherit, password
+## Dummy variables from all_nominal(), -all_outcomes()
+## Zero variance filter on all_predictors()
+```
+]
+
+---
+
+## All in one place
+
+
+```r
+email_rec &lt;- recipe(spam ~ ., data = email) %&gt;%
+  step_rm(from, sent_email) %&gt;%
+  step_date(time, features = c("dow", "month")) %&gt;%               
+  step_rm(time) %&gt;%
+  step_cut(cc, attach, dollar, breaks = c(0, 1)) %&gt;%
+  step_cut(inherit, password, breaks = c(0, 1, 5, 10, 20)) %&gt;%
+  step_dummy(all_nominal(), -all_outcomes()) %&gt;%
+  step_zv(all_predictors())
+```
+
+---
+
+class: middle
+
+# Building workflows
+
+---
+
+## Define model
+
+
+```r
+email_mod &lt;- logistic_reg() %&gt;% 
+  set_engine("glm")
+
+email_mod
+```
+
+```
+## Logistic Regression Model Specification (classification)
+## 
+## Computational engine: glm
+```
+
+---
+
+## Define workflow
+
+**Workflows** bring together models and recipes so that they can be easily applied to both the training and test data.
+
+
+```r
+email_wflow &lt;- workflow() %&gt;% 
+  add_model(email_mod) %&gt;% 
+  add_recipe(email_rec)
+```
+
+.small[
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: logistic_reg()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────────────────────────
+## 7 Recipe Steps
+## 
+## ● step_rm()
+## ● step_date()
+## ● step_rm()
+## ● step_cut()
+## ● step_cut()
+## ● step_dummy()
+## ● step_zv()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────────────────────────
+## Logistic Regression Model Specification (classification)
+## 
+## Computational engine: glm
+```
+]
+
+---
+
+## Fit model to training data
+
+
+```r
+email_fit &lt;- email_wflow %&gt;% 
+  fit(data = train_data)
+```
+
+---
+
+.small[
+
+```r
+tidy(email_fit) %&gt;% print(n = 31)
+```
+
+```
+## # A tibble: 30 x 5
+##    term               estimate std.error statistic  p.value
+##    &lt;chr&gt;                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1 (Intercept)        -1.03      0.266    -3.88    1.05e- 4
+##  2 to_multiple        -3.19      0.454    -7.02    2.19e-12
+##  3 image              -1.05      0.656    -1.61    1.08e- 1
+##  4 num_char            0.0412    0.0293    1.40    1.60e- 1
+##  5 line_breaks        -0.00590   0.00163  -3.62    2.91e- 4
+##  6 format             -0.780     0.161    -4.86    1.16e- 6
+##  7 re_subj            -3.04      0.440    -6.90    5.20e-12
+##  8 exclaim_subj        0.0638    0.268     0.238   8.12e- 1
+##  9 urgent_subj         3.80      1.05      3.61    3.05e- 4
+## 10 exclaim_mess        0.0113    0.00220   5.12    3.04e- 7
+## 11 cc_X.1.68.         -0.0576    0.454    -0.127   8.99e- 1
+## 12 attach_X.1.21.      1.87      0.398     4.71    2.46e- 6
+## 13 dollar_X.1.64.     -0.0244    0.230    -0.106   9.16e- 1
+## 14 winner_yes          2.12      0.403     5.24    1.57e- 7
+## 15 inherit_X.1.5.     -8.88    913.       -0.00973 9.92e- 1
+## 16 inherit_X.5.10.     1.99      1.27      1.57    1.17e- 1
+## 17 password_X.1.5.    -2.47      1.03     -2.40    1.63e- 2
+## 18 password_X.5.10.  -12.3     493.       -0.0250  9.80e- 1
+## 19 password_X.10.20. -14.0     703.       -0.0199  9.84e- 1
+## 20 password_X.20.28. -13.9     810.       -0.0172  9.86e- 1
+## 21 number_small       -0.656     0.168    -3.90    9.53e- 5
+## 22 number_big          0.112     0.249     0.449   6.53e- 1
+## 23 time_dow_Mon       -0.115     0.313    -0.367   7.14e- 1
+## 24 time_dow_Tue        0.191     0.284     0.672   5.02e- 1
+## 25 time_dow_Wed       -0.0520    0.278    -0.187   8.52e- 1
+## 26 time_dow_Thu        0.0421    0.291     0.145   8.85e- 1
+## 27 time_dow_Fri        0.263     0.280     0.938   3.48e- 1
+## 28 time_dow_Sat        0.299     0.307     0.972   3.31e- 1
+## 29 time_month_Feb      0.872     0.181     4.83    1.38e- 6
+## 30 time_month_Mar      0.462     0.185     2.50    1.24e- 2
+```
+]
+
+---
+
+## Make predictions for test data
+
+
+```r
+email_pred &lt;- predict(email_fit, test_data, type = "prob") %&gt;% 
+  bind_cols(test_data) 
+
+email_pred
+```
+
+```
+## # A tibble: 784 x 23
+##   .pred_0 .pred_1 spam  to_multiple  from    cc sent_email
+##     &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;      &lt;dbl&gt;
+## 1   0.962 0.0378  0               0     1     0          0
+## 2   0.940 0.0595  0               0     1     0          0
+## 3   0.928 0.0720  0               0     1     0          1
+## 4   0.998 0.00180 0               0     1     2          0
+## 5   0.881 0.119   0               0     1     0          0
+## 6   0.889 0.111   0               0     1     0          0
+## # … with 778 more rows, and 16 more variables: time &lt;dttm&gt;,
+## #   image &lt;dbl&gt;, attach &lt;dbl&gt;, dollar &lt;dbl&gt;, winner &lt;fct&gt;,
+## #   inherit &lt;dbl&gt;, viagra &lt;dbl&gt;, password &lt;dbl&gt;, num_char &lt;dbl&gt;,
+## #   line_breaks &lt;int&gt;, format &lt;dbl&gt;, re_subj &lt;dbl&gt;,
+## #   exclaim_subj &lt;dbl&gt;, urgent_subj &lt;dbl&gt;, exclaim_mess &lt;dbl&gt;,
+## #   number &lt;fct&gt;
+```
+
+---
+
+## Evaluate the performance
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_curve(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  ) %&gt;%
+  autoplot()
+```
+]
+.pull-right[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-58-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Evaluate the performance
+
+.pull-left[
+
+```r
+email_pred %&gt;%
+  roc_auc(
+    truth = spam,
+    .pred_1,
+    event_level = "second"
+  )
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.831
+```
+]
+.pull-right[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-60-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: middle
+
+# Making decisions
+
+---
+
+## Cutoff probability: 0.5
+
+.panelset[
+.panel[.panel-name[Output]
+
+Suppose we decide to label an email as spam if the model predicts the probability of spam to be **more than 0.5**.
+
+
+|                        | Email is not spam| Email is spam|
+|:-----------------------|-----------------:|-------------:|
+|Email labelled not spam |               703|            68|
+|Email labelled spam     |                 4|             9|
+]
+.panel[.panel-name[Code]
+
+```r
+cutoff_prob &lt;- 0.5
+email_pred %&gt;%
+  mutate(
+    spam      = if_else(spam == 1, "Email is spam", "Email is not spam"),
+    spam_pred = if_else(.pred_1 &gt; cutoff_prob, "Email labelled spam", "Email labelled not spam")
+    ) %&gt;%
+  count(spam_pred, spam) %&gt;%
+  pivot_wider(names_from = spam, values_from = n) %&gt;%
+  kable(col.names = c("", "Email is not spam", "Email is spam"))
+```
+]
+]
+
+---
+
+## Cutoff probability: 0.25
+
+.panelset[
+.panel[.panel-name[Output]
+
+Suppose we decide to label an email as spam if the model predicts the probability of spam to be **more than 0.25**.
+
+
+|                        | Email is not spam| Email is spam|
+|:-----------------------|-----------------:|-------------:|
+|Email labelled not spam |               663|            39|
+|Email labelled spam     |                44|            38|
+]
+.panel[.panel-name[Code]
+
+```r
+cutoff_prob &lt;- 0.25
+email_pred %&gt;%
+  mutate(
+    spam      = if_else(spam == 1, "Email is spam", "Email is not spam"),
+    spam_pred = if_else(.pred_1 &gt; cutoff_prob, "Email labelled spam", "Email labelled not spam")
+    ) %&gt;%
+  count(spam_pred, spam) %&gt;%
+  pivot_wider(names_from = spam, values_from = n) %&gt;%
+  kable(col.names = c("", "Email is not spam", "Email is spam"))
+```
+]
+]
+
+---
+
+## Cutoff probability: 0.75
+
+.panelset[
+.panel[.panel-name[Output]
+
+Suppose we decide to label an email as spam if the model predicts the probability of spam to be **more than 0.75**.
+
+
+|                        | Email is not spam| Email is spam|
+|:-----------------------|-----------------:|-------------:|
+|Email labelled not spam |               706|            72|
+|Email labelled spam     |                 1|             5|
+]
+.panel[.panel-name[Code]
+
+```r
+cutoff_prob &lt;- 0.75
+email_pred %&gt;%
+  mutate(
+    spam      = if_else(spam == 1, "Email is spam", "Email is not spam"),
+    spam_pred = if_else(.pred_1 &gt; cutoff_prob, "Email labelled spam", "Email labelled not spam")
+    ) %&gt;%
+  count(spam_pred, spam) %&gt;%
+  pivot_wider(names_from = spam, values_from = n) %&gt;%
+  kable(col.names = c("", "Email is not spam", "Email is spam"))
+```
+]
+]
+
+---
+
+
+class: inverse, center, middle
+
+# Cross validation
+
+
+
+
+---
+
+class: middle
+
+## Data and exploration
+
+---
+
+background-image: url("img/the-office.jpeg")
+class: middle
+
+---
+
+## Data
+
+
+```r
+office_ratings &lt;- read_csv("data/office_ratings.csv")
+office_ratings
+```
+
+```
+## # A tibble: 188 x 6
+##   season episode title         imdb_rating total_votes air_date  
+##    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;               &lt;dbl&gt;       &lt;dbl&gt; &lt;date&gt;    
+## 1      1       1 Pilot                 7.6        3706 2005-03-24
+## 2      1       2 Diversity Day         8.3        3566 2005-03-29
+## 3      1       3 Health Care           7.9        2983 2005-04-05
+## 4      1       4 The Alliance          8.1        2886 2005-04-12
+## 5      1       5 Basketball            8.4        3179 2005-04-19
+## 6      1       6 Hot Girl              7.8        2852 2005-04-26
+## # … with 182 more rows
+```
+
+.footnote[
+.small[
+Source: The data come from [data.world](https://data.world/anujjain7/the-office-imdb-ratings-dataset), by way of [TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-17/readme.md). 
+]
+]
+
+---
+
+## IMDB ratings
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+ggplot(office_ratings, aes(x = imdb_rating)) +
+  geom_histogram(binwidth = 0.25) +
+  labs(
+    title = "The Office ratings",
+    x = "IMDB Rating"
+  )
+```
+
+]
+
+.panel[.panel-name[Plot]
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-65-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+]
+]
+
+---
+
+## IMDB ratings vs. number of votes
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+ggplot(office_ratings, aes(x = total_votes, y = imdb_rating, color = season)) +
+  geom_jitter(alpha = 0.7) +
+  labs(
+    title = "The Office ratings",
+    x = "Total votes",
+    y = "IMDB Rating",
+    color = "Season"
+  )
+```
+
+]
+
+.panel[.panel-name[Plot]
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-66-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+]
+]
+
+---
+
+## Outliers
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+ggplot(office_ratings, aes(x = total_votes, y = imdb_rating)) +
+  geom_jitter() +
+  gghighlight(total_votes &gt; 4000, label_key = title) +
+  labs(
+    title = "The Office ratings",
+    x = "Total votes",
+    y = "IMDB Rating"
+  )
+```
+
+]
+
+.panel[.panel-name[Plot]
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-67-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+]
+]
+
+.footnote[
+.small[
+If you like the [Dinner Party](https://www.imdb.com/title/tt1031477/) episode, I highly recommend this ["oral history"](https://www.rollingstone.com/tv/tv-features/that-one-night-the-oral-history-of-the-greatest-office-episode-ever-629472/) of the episode published on Rolling Stone magazine.
+]
+]
+
+---
+
+## IMDB ratings vs. seasons
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+ggplot(office_ratings, aes(x = factor(season), y = imdb_rating, color = season)) +
+  geom_boxplot() +
+  geom_jitter() +
+  guides(color = FALSE) +
+  labs(
+    title = "The Office ratings",
+    x = "Season",
+    y = "IMDB Rating"
+  )
+```
+
+]
+
+.panel[.panel-name[Plot]
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-68-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+]
+]
+
+---
+
+class: middle
+
+# Modeling
+
+---
+
+## Train / test
+
+- Create an initial split
+
+
+```r
+set.seed(1122)
+office_split &lt;- initial_split(office_ratings) # prop = 3/4 by default
+```
+
+--
+.pull-left[
+- Save training data
+
+```r
+office_train &lt;- training(office_split)
+dim(office_train)
+```
+
+```
+## [1] 141   6
+```
+]
+
+--
+.pull-right[
+- Save testing data
+
+```r
+office_test  &lt;- testing(office_split)
+dim(office_test)
+```
+
+```
+## [1] 47  6
+```
+]
+
+---
+
+## Specify model
+
+
+```r
+office_mod &lt;- linear_reg() %&gt;%
+  set_engine("lm")
+
+office_mod
+```
+
+```
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+
+---
+
+## Build recipe
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+office_rec &lt;- recipe(imdb_rating ~ ., data = office_train) %&gt;%
+  # title isn't a predictor, but keep around to ID
+  update_role(title, new_role = "ID") %&gt;%
+  # extract month of air_date
+  step_date(air_date, features = "month") %&gt;%
+  step_rm(air_date) %&gt;%
+  # make dummy variables of month 
+  step_dummy(contains("month")) %&gt;%
+  # remove zero variance predictors
+  step_zv(all_predictors())
+```
+]
+.panel[.panel-name[Output]
+.small[
+
+```r
+office_rec
+```
+
+```
+## Data Recipe
+## 
+## Inputs:
+## 
+##       role #variables
+##         ID          1
+##    outcome          1
+##  predictor          4
+## 
+## Operations:
+## 
+## Date features from air_date
+## Delete terms air_date
+## Dummy variables from contains("month")
+## Zero variance filter on all_predictors()
+```
+]
+]
+]
+
+---
+
+## Build workflow
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+office_wflow &lt;- workflow() %&gt;%
+  add_model(office_mod) %&gt;%
+  add_recipe(office_rec)
+```
+]
+.panel[.panel-name[Output]
+.small[
+
+```r
+office_wflow
+```
+
+```
+## ══ Workflow ════════════════════════════════════════════════════════════════════════════════════════
+## Preprocessor: Recipe
+## Model: linear_reg()
+## 
+## ── Preprocessor ────────────────────────────────────────────────────────────────────────────────────
+## 4 Recipe Steps
+## 
+## ● step_date()
+## ● step_rm()
+## ● step_dummy()
+## ● step_zv()
+## 
+## ── Model ───────────────────────────────────────────────────────────────────────────────────────────
+## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm
+```
+]
+]
+]
+
+---
+
+## Fit model
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+office_fit &lt;- office_wflow %&gt;%
+  fit(data = office_train)
+```
+]
+.panel[.panel-name[Output]
+.small[
+
+```r
+tidy(office_fit) %&gt;%
+  print(n = 12)
+```
+
+```
+## # A tibble: 12 x 5
+##    term                estimate std.error statistic  p.value
+##    &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1 (Intercept)         6.63     0.271       24.5    2.60e-50
+##  2 season             -0.0297   0.0180      -1.65   1.02e- 1
+##  3 episode             0.0453   0.00956      4.74   5.68e- 6
+##  4 total_votes         0.000510 0.0000692    7.38   1.75e-11
+##  5 air_date_month_Feb  0.00327  0.142        0.0229 9.82e- 1
+##  6 air_date_month_Mar -0.0585   0.146       -0.402  6.89e- 1
+##  7 air_date_month_Apr -0.150    0.141       -1.06   2.90e- 1
+##  8 air_date_month_May  0.0231   0.178        0.129  8.97e- 1
+##  9 air_date_month_Sep  0.646    0.180        3.58   4.80e- 4
+## 10 air_date_month_Oct  0.572    0.154        3.71   3.11e- 4
+## 11 air_date_month_Nov  0.349    0.140        2.49   1.41e- 2
+## 12 air_date_month_Dec  0.516    0.158        3.27   1.39e- 3
+```
+]
+]
+]
+
+---
+
+class: middle
+
+# Evaluate model
+
+---
+
+## Make predictions for training data
+
+
+```r
+office_train_pred &lt;- predict(office_fit, office_train) %&gt;%
+  bind_cols(office_train %&gt;% select(imdb_rating, title))
+
+office_train_pred
+```
+
+```
+## # A tibble: 141 x 3
+##   .pred imdb_rating title        
+##   &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;        
+## 1  8.48         7.6 Pilot        
+## 2  8.45         8.3 Diversity Day
+## 3  8.10         8.1 The Alliance 
+## 4  8.30         8.4 Basketball   
+## 5  8.18         7.8 Hot Girl     
+## 6  8.90         8.7 The Dundies  
+## # … with 135 more rows
+```
+
+---
+
+## R-squared
+
+Percentage of variability in the IMDB ratings explained by the model
+
+
+```r
+rsq(office_train_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rsq     standard       0.533
+```
+
+--
+
+.question[
+Are models with high or low `\(R^2\)` more preferable?
+]
+
+---
+
+## RMSE
+
+An alternative model performance statistic: **root mean square error**
+
+$$ RMSE = \sqrt{\frac{\sum_{i = 1}^n (y_i - \hat{y}_i)^2}{n}} $$
+
+--
+
+
+```r
+rmse(office_train_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rmse    standard       0.350
+```
+
+--
+
+.question[
+Are models with high or low RMSE are more preferable?
+]
+
+---
+
+## Interpreting RMSE
+
+.question[
+Is this RMSE considered low or high?
+]
+
+
+```r
+rmse(office_train_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rmse    standard       0.350
+```
+
+--
+
+
+```r
+office_train %&gt;%
+  summarise(min = min(imdb_rating), max = max(imdb_rating))
+```
+
+```
+## # A tibble: 1 x 2
+##     min   max
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1   6.8   9.7
+```
+
+---
+
+class: middle
+
+.hand[
+.light-blue[
+but, really, who cares about predictions on .pink[training] data?
+]
+]
+
+---
+
+## Make predictions for testing data
+
+
+```r
+office_test_pred &lt;- predict(office_fit, office_test) %&gt;%
+  bind_cols(office_test %&gt;% select(imdb_rating, title))
+
+office_test_pred
+```
+
+```
+## # A tibble: 47 x 3
+##   .pred imdb_rating title             
+##   &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;             
+## 1  8.11         7.9 Health Care       
+## 2  8.68         8.2 Halloween         
+## 3  8.36         8.3 The Secret        
+## 4  8.56         8.1 Michael's Birthday
+## 5  8.47         8   Grief Counseling  
+## 6  8.49         8.2 Initiation        
+## # … with 41 more rows
+```
+
+---
+
+## Evaluate performance on testing data
+
+- RMSE of model fit to testing data
+
+
+```r
+rmse(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rmse    standard       0.482
+```
+
+- `\(R^2\)` of model fit to testing data
+
+
+```r
+rsq(office_test_pred, truth = imdb_rating, estimate = .pred)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rsq     standard       0.496
+```
+
+---
+
+## Training vs. testing
+
+&lt;br&gt;
+
+
+|metric    | train|  test|comparison                    |
+|:---------|-----:|-----:|:-----------------------------|
+|RMSE      | 0.350| 0.482|RMSE lower for training       |
+|R-squared | 0.533| 0.496|R-squared higher for training |
+
+---
+
+## Evaluating performance on training data
+
+-  The training set does not have the capacity to be a good arbiter of performance.
+
+--
+- It is not an independent piece of information; predicting the training set can only reflect what the model already knows.
+
+--
+- Suppose you give a class a test, then give them the answers, then provide the same test. The student scores on the second test do not accurately reflect what they know about the subject; these scores would probably be higher than their results on the first test.
+
+.footnote[
+.small[
+Source: [tidymodels.org](https://www.tidymodels.org/start/resampling/)
+]
+]
+
+---
+
+class: middle
+
+# Cross validation
+
+---
+
+## Cross validation
+
+More specifically, **v-fold cross validation**:
+
+- Shuffle your data v partitions
+- Use 1 partition for validation, and the remaining v-1 partitions for training
+- Repeat v times
+
+.footnote[
+.small[
+You might also heard of this referred to as k-fold cross validation.
+]
+]
+
+---
+
+## Cross validation
+
+&lt;img src="img/cross-validation.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Split data into folds
+
+.pull-left[
+
+```r
+set.seed(345)
+
+folds &lt;- vfold_cv(office_train, v = 5)
+folds
+```
+
+```
+## #  5-fold cross-validation 
+## # A tibble: 5 x 2
+##   splits           id   
+##   &lt;list&gt;           &lt;chr&gt;
+## 1 &lt;split [112/29]&gt; Fold1
+## 2 &lt;split [113/28]&gt; Fold2
+## 3 &lt;split [113/28]&gt; Fold3
+## 4 &lt;split [113/28]&gt; Fold4
+## 5 &lt;split [113/28]&gt; Fold5
+```
+]
+.pull-right[
+&lt;img src="img/cross-validation.png" width="100%" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
+---
+
+## Fit resamples
+
+.pull-left[
+
+```r
+set.seed(456)
+
+office_fit_rs &lt;- office_wflow %&gt;%
+  fit_resamples(folds)
+
+office_fit_rs
+```
+
+```
+## # Resampling results
+## # 5-fold cross-validation 
+## # A tibble: 5 x 4
+##   splits           id    .metrics             .notes             
+##   &lt;list&gt;           &lt;chr&gt; &lt;list&gt;               &lt;list&gt;             
+## 1 &lt;split [112/29]&gt; Fold1 &lt;tibble[,4] [2 × 4]&gt; &lt;tibble[,1] [0 × 1…
+## 2 &lt;split [113/28]&gt; Fold2 &lt;tibble[,4] [2 × 4]&gt; &lt;tibble[,1] [0 × 1…
+## 3 &lt;split [113/28]&gt; Fold3 &lt;tibble[,4] [2 × 4]&gt; &lt;tibble[,1] [0 × 1…
+## 4 &lt;split [113/28]&gt; Fold4 &lt;tibble[,4] [2 × 4]&gt; &lt;tibble[,1] [0 × 1…
+## 5 &lt;split [113/28]&gt; Fold5 &lt;tibble[,4] [2 × 4]&gt; &lt;tibble[,1] [0 × 1…
+```
+]
+.pull-right[
+&lt;img src="img/cross-validation-animated.gif" width="100%" style="display: block; margin: auto 0 auto auto;" /&gt;
+]
+
+---
+
+## Collect CV metrics
+
+
+```r
+collect_metrics(office_fit_rs)
+```
+
+```
+## # A tibble: 2 x 6
+##   .metric .estimator  mean     n std_err .config             
+##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+## 1 rmse    standard   0.378     5  0.0260 Preprocessor1_Model1
+## 2 rsq     standard   0.442     5  0.0816 Preprocessor1_Model1
+```
+
+---
+
+## Deeper look into CV metrics
+
+.panelset[
+.panel[.panel-name[Raw]
+
+```r
+collect_metrics(office_fit_rs, summarize = FALSE) %&gt;%
+  print(n = 10)
+```
+
+```
+## # A tibble: 10 x 5
+##    id    .metric .estimator .estimate .config             
+##    &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+##  1 Fold1 rmse    standard       0.399 Preprocessor1_Model1
+##  2 Fold1 rsq     standard       0.449 Preprocessor1_Model1
+##  3 Fold2 rmse    standard       0.306 Preprocessor1_Model1
+##  4 Fold2 rsq     standard       0.749 Preprocessor1_Model1
+##  5 Fold3 rmse    standard       0.438 Preprocessor1_Model1
+##  6 Fold3 rsq     standard       0.390 Preprocessor1_Model1
+##  7 Fold4 rmse    standard       0.419 Preprocessor1_Model1
+##  8 Fold4 rsq     standard       0.280 Preprocessor1_Model1
+##  9 Fold5 rmse    standard       0.327 Preprocessor1_Model1
+## 10 Fold5 rsq     standard       0.344 Preprocessor1_Model1
+```
+]
+.panel[.panel-name[Tidy]
+
+|Fold  |  RMSE| R-squared|
+|:-----|-----:|---------:|
+|Fold1 | 0.399|     0.449|
+|Fold2 | 0.306|     0.749|
+|Fold3 | 0.438|     0.390|
+|Fold4 | 0.419|     0.280|
+|Fold5 | 0.327|     0.344|
+]
+]
+
+---
+
+## How does RMSE compare to y?
+
+- Cross validation RMSE stats
+
+
+```
+## # A tibble: 1 x 6
+##     min   max  mean   med     sd    IQR
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 0.306 0.438 0.378 0.399 0.0581 0.0918
+```
+
+- Training data IMDB score stats
+
+
+```
+## # A tibble: 1 x 6
+##     min   max  mean   med    sd   IQR
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1   6.8   9.7  8.26   8.3 0.514 0.700
+```
+
+---
+
+## What's next?
+
+&lt;img src="img/post-cv-testing.png" width="100%" style="display: block; margin: auto 0 auto auto;" /&gt;
+
+
+---
+
+
+class: inverse, center, middle
+
+# Quantifying uncertainty
+
+
+
+
+---
+
+class: middle, center
+
+## Recap and motivation
+
+---
+
+## Data
+
+- Family income and gift aid data from a random sample of fifty students in the freshman class of Elmhurst College in Illinois, USA
+- Gift aid is financial aid that does not need to be paid back, as opposed to a loan
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-98-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+.small[
+The data come from the openintro package: [`elmhurst`](http://openintrostat.github.io/openintro/reference/elmhurst.html).
+]
+]
+
+---
+
+## Linear model
+
+.pull-left[
+.small[
+
+```r
+linear_reg() %&gt;%
+  set_engine("lm") %&gt;%
+  fit(gift_aid ~ family_income, data = elmhurst) %&gt;%
+  tidy()
+```
+
+```
+## # A tibble: 2 x 5
+##   term          estimate std.error statistic  p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)    24.3       1.29       18.8  8.28e-24
+## 2 family_income  -0.0431    0.0108     -3.98 2.29e- 4
+```
+]
+]
+.pull-right[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-100-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Interpreting the slope
+
+.pull-left-wide[
+
+```
+## # A tibble: 2 x 5
+##   term          estimate std.error statistic  p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)    24.3       1.29       18.8  8.28e-24
+## 2 family_income  -0.0431    0.0108     -3.98 2.29e- 4
+```
+]
+.pull-right-narrow[
+&lt;img src="Week6_files/figure-html/unnamed-chunk-101-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+For each additional $1,000 of family income, we would expect students to receive a net difference of 1,000 * (-0.0431) = -$43.10 in aid on average, i.e. $43.10 less in gift aid, on average.
+
+---
+
+class: middle
+
+.hand[
+.light-blue[
+exactly $43.10 for all students at this school?!
+]
+]
+
+---
+
+class: middle
+
+# Inference
+
+---
+
+## Statistical inference 
+
+... is the process of using sample data to make conclusions about the underlying population the sample came from
+
+&lt;img src="img/photo-1571942676516-bcab84649e44.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Estimation
+
+So far we have done lots of estimation (mean, median, slope, etc.), i.e.
+- used data from samples to calculate sample statistics
+- which can then be used as estimates for population parameters
+
+---
+
+.question[
+If you want to catch a fish, do you prefer a spear or a net?
+]
+
+&lt;br&gt;
+
+.pull-left[
+&lt;img src="img/spear.png" width="80%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="img/net.png" width="80%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.question[
+If you want to estimate a population parameter, do you prefer to report a range of values the parameter might be in, or a single value?
+]
+
+&lt;br&gt;
+
+--
+
+- If we report a point estimate, we probably won’t hit the exact population parameter
+- If we report a range of plausible values we have a good shot at capturing the parameter
+
+---
+
+.center[
+&lt;iframe width="1100" height="500" src="https://news.gallup.com/poll/323480/britons-approval-leadership-new-low.aspx" frameborder="0" style="background:white;"&gt;&lt;/iframe&gt;  
+]
+
+.footnote[
+.midi[
+Source: Gallup. [Britons' Approval of U.S. Leadership at New Low](https://news.gallup.com/poll/323480/britons-approval-leadership-new-low.aspx), 5 Nov 2020.
+]
+]
+
+---
+
+class: middle
+
+# Confidence intervals
+
+---
+
+## Confidence intervals
+
+A plausible range of values for the population parameter is a **confidence interval**.
+
+--
+- In order to construct a confidence interval we need to quantify the variability of our sample statistic
+
+--
+- For example, if we want to construct a confidence interval for a population slope, we need to come up with a plausible range of values around our observed sample slope
+
+--
+- This range will depend on how precise and how accurate our sample mean is as an estimate of the population mean
+
+--
+- Quantifying this requires a measurement of how much we would expect the sample population to vary from sample to sample
+
+---
+
+.question[
+Suppose we split the class in half down the middle of the classroom and ask each student their heights. Then, we calculate the mean height of students on each side of the classroom. Would you expect these two means to be exactly equal, close but not equal, or wildly different?
+]
+
+--
+
+&lt;br&gt;
+
+.question[
+Suppose you randomly sample 50 students and 5 of them are left handed. If you were to take another random sample of 50 students, how many would you expect to be left handed? Would you be surprised if only 3 of them were left handed? Would you be surprised if 40 of them were left handed?
+]
+
+---
+
+## Quantifying the variability of slopes
+
+We can quantify the variability of sample statistics using
+
+- simulation: via bootstrapping (now)
+
+or
+
+- theory: via Central Limit Theorem (future stat courses!)
+
+
+```
+## # A tibble: 2 x 5
+##   term          estimate std.error statistic  p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)    24.3       1.29       18.8  8.28e-24
+## 2 family_income  -0.0431    0.0108     -3.98 2.29e- 4
+```
+
+---
+
+class: middle
+
+# Bootstrapping
+
+---
+
+## Bootstrapping
+
+.pull-left-wide[
+- _"pulling oneself up by one’s bootstraps"_: accomplishing an impossible task without any outside help
+- **Impossible task:** estimating a population parameter using data from only the given sample
+- **Note:** Notion of saying something about a population parameter using only information from an observed sample is the crux of statistical inference
+]
+.pull-right-narrow[
+.huge[
+🥾
+]
+]
+
+---
+
+
+
+## Observed sample
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-107-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrap population
+
+Generated assuming there are more students like the ones in the observed sample...
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-108-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrapping scheme
+
+1. Take a bootstrap sample - a random sample taken **with replacement** from the original sample, of the same size as the original sample
+
+--
+2. Calculate the bootstrap statistic - a statistic such as mean, median, proportion, slope, etc. computed on the bootstrap samples
+
+--
+3. Repeat steps (1) and (2) many times to create a bootstrap distribution - a distribution of bootstrap statistics
+
+--
+4. Calculate the bounds of the XX% confidence interval as the middle XX% of the bootstrap distribution
+
+---
+
+## Bootstrap sample 1
+
+
+```r
+elmhurtst_boot_1 &lt;- elmhurst %&gt;%
+  slice_sample(n = 50, replace = TRUE)
+```
+
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-110-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrap sample 2
+
+
+```r
+elmhurtst_boot_2 &lt;- elmhurst %&gt;%
+  slice_sample(n = 50, replace = TRUE)
+```
+
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-112-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrap sample 3
+
+
+```r
+elmhurtst_boot_3 &lt;- elmhurst %&gt;%
+  slice_sample(n = 50, replace = TRUE)
+```
+
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-114-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrap sample 4
+
+
+```r
+elmhurtst_boot_4 &lt;- elmhurst %&gt;%
+  slice_sample(n = 50, replace = TRUE)
+```
+
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-116-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrap samples 1 - 4
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-117-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle
+
+.hand[
+.light-blue[
+we could keep going...
+]
+]
+
+---
+
+## Many many samples...
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-118-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Slopes of bootstrap samples
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-119-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## 95% confidence interval
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-120-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Interpreting the slope, take two
+
+
+```
+## # A tibble: 2 x 6
+##   term           .lower .estimate  .upper .alpha .method   
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;     
+## 1 (Intercept)   21.9      24.4    26.8      0.05 percentile
+## 2 family_income -0.0689   -0.0441 -0.0227   0.05 percentile
+```
+
+**We are 95% confident that** for each additional $1,000 of family income, we would expect students to receive $69.50 to $21.90 less in gift aid, on average.
+
+---
+
+## Code
+
+
+```r
+# set a seed
+set.seed(1234)
+
+# take 1000 bootstrap samples
+elmhurst_boot &lt;- bootstraps(elmhurst, times = 1000)
+
+# for each sample
+# fit a model and save output in model column
+# tidy model output and save in coef_info column 
+elmhurst_models &lt;- elmhurst_boot %&gt;%
+  mutate(
+    model = map(splits, ~ lm(gift_aid ~ family_income, data = .)),
+    coef_info = map(model, tidy)
+  )
+
+# unnest coef_info (for intercept and slope)
+elmhurst_coefs &lt;- elmhurst_models %&gt;%
+  unnest(coef_info)
+
+# calculate 95% (default) percentile interval
+int_pctl(elmhurst_models, coef_info)
+```
+
+
+---
+
+
+class: inverse, middle, center
+
+# Bootstrapping
+
+
+
+
+---
+
+## Rent in Edinburgh
+
+.question[
+Take a guess! How much does a typical 3 BR flat in Edinburgh rents for?
+]
+
+---
+
+## Sample
+
+Fifteen 3 BR flats in Edinburgh were randomly selected on rightmove.co.uk.
+
+
+```r
+library(tidyverse)
+edi_3br &lt;- read_csv2("data/edi-3br.csv") # ; separated
+```
+
+.small[
+
+```
+## # A tibble: 15 x 4
+##   flat_id  rent title               address                      
+##   &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;               &lt;chr&gt;                        
+## 1 flat_01   825 3 bedroom apartmen… Burnhead Grove, Edinburgh, M…
+## 2 flat_02  2400 3 bedroom flat to … Simpson Loan, Quartermile, E…
+## 3 flat_03  1900 3 bedroom flat to … FETTES ROW, NEW TOWN, EH3 6SE
+## 4 flat_04  1500 3 bedroom apartmen… Eyre Crescent, Edinburgh, Mi…
+## 5 flat_05  3250 3 bedroom flat to … Walker Street, Edinburgh     
+## 6 flat_06  2145 3 bedroom flat to … George Street, City Centre, …
+## # … with 9 more rows
+```
+]
+
+---
+
+## Observed sample
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-125-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Observed sample
+
+Sample mean ≈ £1895 😱
+
+&lt;br&gt;
+
+&lt;img src="img/rent-bootsamp.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrap population
+
+Generated assuming there are more flats like the ones in the observed sample... Population mean = ❓
+
+&lt;img src="img/rent-bootpop.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Bootstrapping scheme
+
+1. Take a bootstrap sample - a random sample taken **with replacement** from the 
+original sample, of the same size as the original sample
+2. Calculate the bootstrap statistic - a statistic such as mean, median, 
+proportion, slope, etc. computed on the bootstrap samples
+3. Repeat steps (1) and (2) many times to create a bootstrap distribution - 
+a distribution of bootstrap statistics
+4. Calculate the bounds of the XX% confidence interval as the middle XX% 
+of the bootstrap distribution
+
+---
+
+class: middle
+
+# Bootstrapping with tidymodels
+
+---
+
+## Generate bootstrap means
+
+
+```r
+edi_3br %&gt;%
+  # specify the variable of interest
+  specify(response = rent)
+```
+
+---
+
+## Generate bootstrap means
+
+
+```r
+edi_3br %&gt;%
+  # specify the variable of interest
+  specify(response = rent)
+  # generate 15000 bootstrap samples
+  generate(reps = 15000, type = "bootstrap")
+```
+
+---
+
+## Generate bootstrap means
+
+
+```r
+edi_3br %&gt;%
+  # specify the variable of interest
+  specify(response = rent)
+  # generate 15000 bootstrap samples
+  generate(reps = 15000, type = "bootstrap")
+  # calculate the mean of each bootstrap sample
+  calculate(stat = "mean")
+```
+
+---
+
+## Generate bootstrap means
+
+
+
+
+
+```r
+# save resulting bootstrap distribution
+boot_df &lt;- edi_3br %&gt;%
+  # specify the variable of interest
+  specify(response = rent) %&gt;% 
+  # generate 15000 bootstrap samples
+  generate(reps = 15000, type = "bootstrap") %&gt;% 
+  # calculate the mean of each bootstrap sample
+  calculate(stat = "mean")
+```
+
+---
+
+## The bootstrap sample
+
+.question[
+How many observations are there in `boot_df`? What does each observation represent?
+]
+
+
+```r
+boot_df
+```
+
+```
+## # A tibble: 15,000 x 2
+##   replicate  stat
+##       &lt;int&gt; &lt;dbl&gt;
+## 1         1 2285 
+## 2         2 1890 
+## 3         3 1822.
+## 4         4 1939.
+## 5         5 2106.
+## 6         6 2035 
+## # … with 14,994 more rows
+```
+
+---
+
+## Visualize the bootstrap distribution
+
+
+```r
+ggplot(data = boot_df, mapping = aes(x = stat)) +
+  geom_histogram(binwidth = 100) +
+  labs(title = "Bootstrap distribution of means")
+```
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-134-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Calculate the confidence interval
+
+A 95% confidence interval is bounded by the middle 95% of the bootstrap distribution.
+
+
+```r
+boot_df %&gt;%
+  summarize(lower = quantile(stat, 0.025),
+            upper = quantile(stat, 0.975))
+```
+
+```
+## # A tibble: 1 x 2
+##   lower upper
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1 1595. 2221.
+```
+
+---
+
+## Visualize the confidence interval
+
+
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-137-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Interpret the confidence interval
+
+.question[
+The 95% confidence interval for the mean rent of three bedroom flats in Edinburgh was calculated as (1595, 2221). Which of the following is the correct interpretation of this interval?
+
+**(a)** 95% of the time the mean rent of three bedroom flats in this sample is between £1595 and £2221.
+
+**(b)** 95% of all three bedroom flats in Edinburgh have rents between £1595 and £2221.
+
+**(c)** We are 95% confident that the mean rent of all three bedroom flats is between £1595 and £2221.
+
+**(d)** We are 95% confident that the mean rent of three bedroom flats in this sample is between £1595 and £2221.
+]
+
+---
+
+class: middle
+
+# Accuracy vs. precision
+
+---
+
+## Confidence level
+
+**We are 95% confident that ...**
+
+- Suppose we took many samples from the original population and built a 95% confidence interval based on each sample.
+- Then about 95% of those intervals would contain the true population parameter.
+
+---
+
+## Commonly used confidence levels
+
+.question[
+Which line (orange dash/dot, blue dash, green dot) represents which confidence level?
+]
+
+&lt;img src="Week6_files/figure-html/unnamed-chunk-138-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Precision vs. accuracy
+
+.question[
+If we want to be very certain that we capture the population parameter, should we use a wider or a narrower interval? What drawbacks are associated with using a wider interval?
+]
+
+--
+
+&lt;img src="img/garfield.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+--
+
+.question[
+How can we get best of both worlds -- high precision and high accuracy?
+]
+
+---
+
+## Changing confidence level
+
+.question[
+How would you modify the following code to calculate a 90% confidence interval? 
+How would you modify it for a 99% confidence interval?
+]
+
+
+```r
+edi_3br %&gt;%
+  specify(response = rent) %&gt;% 
+  generate(reps = 15000, type = "bootstrap") %&gt;% 
+  calculate(stat = "mean") %&gt;%
+  summarize(lower = quantile(stat, 0.025),
+            upper = quantile(stat, 0.975))
+```
+
+---
+
+## Recap
+
+- Sample statistic `\(\ne\)` population parameter, but if the sample is good, it can be a good estimate
+- We report the estimate with a confidence interval, and the width of this interval depends on the variability of sample statistics from different samples from the population
+- Since we can't continue sampling from the population, we bootstrap from the one sample we have to estimate sampling variability
+- We can do this for any sample statistic:
+  - For a mean: `calculate(stat = "mean")`
+  - For a median: `calculate(stat = "median")`
+  - Learn about calculating bootstrap intervals for other statistics in your homework
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

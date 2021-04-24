@@ -18,6 +18,11 @@ options(
 )
 ```
 
+```{r, echo = F}
+email <- email %>% mutate(spam = factor(spam))
+```
+
+
 
 ---
 
@@ -265,7 +270,7 @@ email_pred
 ## Evaluate the performance
 
 .pull-left[
-```{r roc, fig.show="hide"}
+```{r , fig.show="hide"}
 email_pred %>%
   roc_curve(
     truth = spam,
