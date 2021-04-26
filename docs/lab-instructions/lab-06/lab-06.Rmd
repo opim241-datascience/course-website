@@ -1,6 +1,6 @@
 ---
-title: "Lab 12 - Smoking during pregnacy"
-subtitle: "Simulation based inference"
+title: "Lab 6: Tidymodels - Recipes, Workflows and Models"
+subtitle: "Learn how to build classification models with tidymodels"
 output: 
   tufte::tufte_html:
     tufte_variant: "envisioned"
@@ -9,141 +9,690 @@ output:
 link-citations: yes
 ---
 
-```{r include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
 ```
 
-In 2004, the state of North Carolina released a large data set containing information on births recorded in this state.
-This data set is useful to researchers studying the relation between habits and practices of expectant mothers and the birth of their children.
-We will work with a random sample of observations from this data set.
+* This tutorial was sourced from [](https://github.com/kirenz/tidymodels-in-r) and is based on the excellent [tidymodels documentation](https://www.tidymodels.org/start/recipes/).*
 
-# Learning goals
+In this tutorial, we’ll explore the tidymodels packages `recipes` and `workflows` which are designed to help you preprocess your data before training your model. 
 
--   Constructing confidence intervals
--   Conducting hypothesis tests
--   Interpreting confidence intervals and results of hypothesis tests in context of the data
+`Recipes` are built as a series of preprocessing steps, such as:
 
-# Getting started
+* converting qualitative predictors to indicator variables (also known as dummy variables),
+* transforming data to be on a different scale (e.g., taking the logarithm of a variable),
+* transforming whole groups of predictors together,
+* extracting key features from raw variables (e.g., getting the day of the week out of a date variable),
 
-Go to the course GitHub organization and locate your homework repo, clone it in RStudio and open the R Markdown document.
-Knit the document to make sure it compiles without errors.
+and so on. If you are familiar with R’s formula interface, a lot of this might sound familiar and like what a formula already does. Recipes can be used to do many of the same things, but they have a much wider range of possibilities. This article shows how to use recipes for modeling.
 
-## Warm up
+To combine all of the steps discussed above with model building, we can use the package [workflows](https://workflows.tidymodels.org). A workflow is an object that can bundle together your pre-processing, modeling, and post-processing requests. 
 
-Let's warm up with some simple exercises.
-Update the YAML of your R Markdown file with your information, knit, commit, and push your changes.
-Make sure to commit with a meaningful commit message.
-Then, go to your repo on GitHub and confirm that your changes are visible in your Rmd **and** md files.
-If anything is missing, commit and push again.
+To use the code in this tutorial, you will need to install the following packages: 
 
-## Packages
-
-We'll use the **tidyverse** package for much of the data wrangling and visualisation, the **tidymodels** package for inference, and the data lives in the **dsbox** package.
-These packages are already installed for you.
-You can load them by running the following in your Console:
+* `nycflights13`, 
+* `skimr`, 
+* `tidymodels` and
+* `tidyverse`
 
 ```{r}
-library(tidyverse) 
-library(tidymodels)
-library(openintro)
+library(tidyverse)
+library(tidymodels)  
+# for flight data:
+library(nycflights13)
+# for variable summaries:
+library(skimr)    
+
 ```
 
-## Data
+# Data preparation
 
-The data can be found in the **dsbox** package, and it's called `ncbirths`.
-Since the dataset is distributed with the package, we don't need to load it separately; it becomes available to us when we load the package.
-You can find out more about the dataset by inspecting its documentation, which you can access by running `?ncbirths` in the Console or using the Help menu in RStudio to search for `ncbirths`.
-You can also find this information [here](https://rstudio-education.github.io/dsbox/reference/ncbirths.html).
+Let’s use the `nycflights13` data to predict whether a plane arrives more than 30 minutes late. This data set contains information on 325,819 flights departing near New York City in 2013. Furthermore, it contains weather data (hourly meterological data for LGA, JFK and EWR).
 
-# Set a seed!
+Let’s start by loading the data and making a few changes to the variables:
 
-In this lab we'll be generating random samples.
-The last thing you want is those samples to change every time you knit your document.
-So, you should set a seed.
-There's an R chunk in your R Markdown file set aside for this.
-Locate it and add a seed.
-Make sure all members in a team are using the same seed so that you don't get merge conflicts and your results match up for the narratives.
+```{r}
 
-# Exercises
+flight_data <- 
+  flights %>% 
+  mutate(
+    # Convert the arrival delay to a factor
+    arr_delay = ifelse(arr_delay >= 30, 
+                       "late", 
+                       "on_time"),
+    arr_delay = factor(arr_delay),
+    # We will use the date (not date-time) 
+    # in the recipe below
+    date = as.Date(time_hour)
+  ) %>% 
+  # Include  weather data
+  inner_join(weather, by = c("origin", "time_hour")) %>% 
+  # Only retain the specific columns we will use
+  select(dep_time, flight, origin, 
+         dest, air_time, distance, 
+         carrier, date, arr_delay, time_hour) %>% 
+  # Exclude missing data
+  na.omit() %>% 
+  # For creating models, it is 
+  # better to have qualitative columns
+  # encoded as factors (instead of character strings)
+  mutate(across(where(is.character), as.factor))
 
-1.  What are the cases in this data set? How many cases are there in our sample?
-
-The first step in the analysis of a new dataset is getting acquainted with the data.
-Make summaries of the variables in your dataset, determine which variables are categorical and which are numerical.
-For numerical variables, are there outliers?
-If you aren't sure or want to take a closer look at the data, make a graph.
-
-## Baby weights
-
-A 1995 study suggests that average weight of Caucasian babies born in the US is 3,369 grams (7.43 pounds).[^lab-12-inference-smoking-1]
-In this dataset we only have information on mother's race, so we will make the simplifying assumption that babies of Caucasian mothers are also Caucasian, i.e. `whitemom = "white"`.
-
-We want to evaluate whether the average weight of Caucasian babies has changed since 1995.
-
-Our null hypothesis should state "there is nothing going on", i.e. no change since 1995: $H_0: \mu = 7.43~pounds$.
-
-Our alternative hypothesis should reflect the research question, i.e. some change since 1995.
-Since the research question doesn't state a direction for the change, we use a two sided alternative hypothesis: $H_A: \mu \ne 7.43~pounds$.
-
-3.  Create a filtered data frame called `ncbirths_white` that contain data only from white mothers.
-    Then, calculate the mean of the weights of their babies.
-
-4.  Are the conditions necessary for conducting simulation based inference satisfied?
-    Explain your reasoning.
-
-Let's discuss how this test would work.
-Our goal is to simulate a null distribution of sample means that is centred at the null value of 7.43 pounds.
-In order to do so, we
-
--   take a bootstrap sample of from the original sample,
--   calculate this bootstrap sample's mean,
--   repeat these two steps a large number of times to create a bootstrap distribution of means centred at the observed sample mean,
--   shift this distribution to be centred at the null value by subtracting / adding X to all bootstrap mean (X = difference between mean of bootstrap distribution and null value), and
--   calculate the p-value as the proportion of bootstrap samples that yielded a sample mean at least as extreme as the observed sample mean.
-
-5.  Run the appropriate hypothesis test, visualize the null distribution, calculate the p-value, and interpret the results in context of the data and the hypothesis test.
-
-## Baby weight vs. smoking
-
-Consider the possible relationship between a mother's smoking habit and the weight of her baby.
-Plotting the data is a useful first step because it helps us quickly visualize trends, identify strong associations, and develop research questions.
-
-6.  Make side-by-side boxplots displaying the relationship between `habit` and `weight`.
-    What does the plot highlight about the relationship between these two variables?
-
-7.  Before moving forward, save a version of the dataset omitting observations where there are NAs for `habit`.
-    You can call this version `ncbirths_habitgiven`.
-
-The box plots show how the medians of the two distributions compare, but we can also compare the means of the distributions using the following to first group the data by the `habit` variable, and then calculate the mean `weight` in these groups using.
-
-```{r habit-means, eval=FALSE}
-ncbirths_habitgiven %>%
-  group_by(habit) %>%
-  summarise(mean_weight = mean(weight))
 ```
 
-There is an observed difference, but is this difference statistically significant?
-In order to answer this question we will conduct a hypothesis test .
 
-7.  Write the hypotheses for testing if the average weights of babies born to smoking and non-smoking mothers are different.
+Take a look at the proportion of flights which arrived more than 30 minutes late:
 
-8.  Are the conditions necessary for conducting simulation based inference satisfied?
-    Explain your reasoning.
+```{r}
 
-9.  Run the appropriate hypothesis test, calculate the p-value, and interpret the results in context of the data and the hypothesis test.
+flight_data %>% 
+  count(arr_delay) %>% 
+  mutate(prop = n/sum(n))
 
-10. Construct a 95% confidence interval for the difference between the average weights of babies born to smoking and non-smoking mothers.
+```
 
-## Baby weight vs. mother's age
+## Data overview
 
-In this portion of the analysis we focus on two variables.
-The first one is `maturemom`.
+Before we start building up our recipe, let’s take a quick look at a few specific variables that will be important for both preprocessing and modeling.
 
-11. First, a non-inference task: Determine the age cutoff for younger and mature mothers. Use a method of your choice, and explain how your method works.
+First, notice that the variable we created called `arr_delay` is a factor variable; it is important that our outcome variable for training a classification model (at least a logistic regression model) is numeric.
 
-The other variable of interest is `lowbirthweight`.
+```{r}
 
-12. Conduct a hypothesis test evaluating whether the proportion of low birth weight babies is higher for mature mothers. State the hypotheses, verify the conditions, run the test and calculate the p-value, and state your conclusion in context of the research question. Use $\alpha = 0.05$. If you find a significant difference, construct a confidence interval, at the equivalent level to the hypothesis test, for the difference between the proportions of low birth weight babies between mature and younger mothers, and interpret this interval in context of the data.
+glimpse(flight_data)
 
-[^lab-12-inference-smoking-1]: Wen, Shi Wu, Michael S. Kramer, and Robert H. Usher.
-    "Comparison of birth weight distributions between Chinese and Caucasian infants." American Journal of Epidemiology 141.12 (1995): 1177-1187.
+```
+
+Second, there are two variables that we don’t want to use as predictors in our model, but that we would like to retain as identification variables that can be used to troubleshoot poorly predicted data points. These are flight, a numeric value, and time_hour, a date-time value.
+
+Third, there are 79 flight destinations contained in dest and 14 distinct carriers.
+
+
+```{r}
+
+flight_data %>% 
+  skimr::skim(dest, carrier) 
+
+```
+
+
+Because we’ll be using a logistic regression model in this tutorial (among other models), the variables `dest` and `carrier` will be converted to dummy variables. 
+
+However, some of these values do not occur very frequently and this could complicate our analysis. We’ll discuss specific steps later in this tutorial that we can add to our recipe to address this issue before modeling.
+
+# Data splitting 
+
+To get started, let’s split this single dataset into two: a training set and a testing set. We’ll keep most of the rows in the original dataset (subset chosen randomly) in the training set. The training data will be used to fit the model, and the testing set will be used to measure model performance.
+
+To do this, we can use the `rsample` package (included in `tidymodels`) to create an object that contains the information on how to split the data, and then two more rsample functions to create data frames for the training and testing sets:
+
+```{r}
+
+# Fix the random numbers by setting the seed 
+# This enables the analysis to be reproducible 
+# when random numbers are used 
+set.seed(555)
+
+# Put 3/4 of the data into the training set 
+data_split <- initial_split(flight_data, 
+                            prop = 3/4)
+
+# Create data frames for the two sets:
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+
+```
+
+# Create recipe and roles 
+
+To get started, let’s create a recipe for a classification model. Before training the models, we can use a recipe to create a few new predictors and conduct some preprocessing required by the model.
+
+The `recipe()` function has two arguments:
+
+* *A formula*. Any variable on the left-hand side of the tilde (~) is considered the model outcome (here, `arr_delay`). On the right-hand side of the tilde are the predictors. Variables may be listed by name, or you can use the dot (.) to indicate all other variables as predictors.
+
+* *The data*. A recipe is associated with the data set used to create the model. This will typically be the training set, so `data = train_data` here. Naming a data set doesn’t actually change the data itself; it is only used to catalog the names of the variables and their types, like factors, integers, dates, etc.
+
+We can also add roles to this recipe. We can use the `update_role()` function to let recipes know that `flight` and `time_hour` are variables with a custom role that we call "ID" (a role can have any character value). Whereas our formula included all variables in the training set other than `arr_delay` as predictors, this tells the recipe to keep these two variables but not use them as either outcomes or predictors.
+
+```{r}
+
+flights_rec <- 
+  recipe(arr_delay ~ ., data = train_data) %>%
+  update_role(flight, 
+              time_hour, 
+              new_role = "ID") 
+
+```
+
+This step of adding roles to a recipe is optional; the purpose of using it here is that those two variables can be retained in the data but not included in the model. This can be convenient when, after the model is fit, we want to investigate some poorly predicted value. These ID columns will be available and can be used to try to understand what went wrong.
+
+To get the current set of variables and roles, use the summary() function:
+
+```{r}
+
+summary(flights_rec)
+
+```
+
+## Create features  
+
+Now we can start adding steps onto our recipe using the pipe operator. 
+
+### Date
+
+Perhaps it is reasonable for the `date` of the flight to have an effect on the likelihood of a late arrival. A little bit of feature engineering might go a long way to improving our model. How should the date be encoded into the model? The date column has an R date object so including that column “as is” will mean that the model will convert it to a numeric format equal to the number of days after a reference date:
+
+```{r}
+
+flight_data %>% 
+  distinct(date) %>% 
+  mutate(numeric_date = as.numeric(date)) 
+
+```
+
+It’s possible that the numeric date variable is a good option for modeling. However, it might be better to add model terms derived from the date that have a better potential to be important to the model. For example, we could derive the following meaningful features from the single date variable:
+
+ * the day of the week,
+ * the month, and
+ * whether or not the date corresponds to a holiday.
+
+Let’s do all three of these by adding steps to our recipe:
+
+```{r}
+
+flights_rec <- 
+  recipe(arr_delay ~ ., 
+         data = train_data) %>%
+  update_role(flight, 
+              time_hour, 
+              new_role = "ID") %>% 
+  step_date(date, 
+            features = c("dow", "month")) %>%               
+  step_holiday(date, 
+               holidays = timeDate::listHolidays("US")) %>% 
+  step_rm(date)
+
+```
+
+What do each of these steps do?
+
+ * With `step_date()`, we created two new factor columns with the appropriate day of the week (dow) and the month.
+ 
+* With `step_holiday()`, we created a binary variable indicating whether the current date is a holiday or not. The argument value of `timeDate::listHolidays("US"`) uses the timeDate package to list the 17 standard US holidays.
+ 
+* With `step_rm()`, we remove the original date variable since we no longer want it in the model.
+
+Next, we’ll turn our attention to the variable types of our predictors. Because we plan to train a classifiaction model, we know that predictors will ultimately need to be numeric, as opposed to factor variables. In other words, there may be a difference in how we store our data (in factors inside a data frame), and how the underlying equations require them (a purely numeric matrix).
+
+### Dummy variables
+
+For factors like `dest` and `origin`, standard practice is to convert them into *dummy* or indicator variables to make them numeric. These are binary values for each level of the factor. For example, our origin variable has values of "EWR", "JFK", and "LGA". The standard dummy variable encoding, shown below, will create two numeric columns of the data that are 1 when the originating airport is "JFK" or "LGA" and zero otherwise, respectively.
+
+ORIGIN | ORIGIN_JFK | ORIGIN_LGA |
+|---|---|---|
+EWR | 0 | 0 |
+JFK | 1 | 0 |
+LGA | 0 | 1 |
+
+
+But, unlike the standard model formula methods in R, a recipe does not automatically create these dummy variables for you; you’ll need to tell your recipe to add this step. This is for two reasons. First, many models do not require numeric predictors, so dummy variables may not always be preferred. Second, recipes can also be used for purposes outside of modeling, where non-dummy versions of the variables may work better. For example, you may want to make a table or a plot with a variable as a single factor. For those reasons, you need to explicitly tell recipes to create dummy variables using step_dummy():
+
+```{r}
+
+flights_rec <- 
+  recipe(arr_delay ~ ., 
+         data = train_data) %>%
+  update_role(flight, 
+              time_hour, 
+              new_role = "ID") %>% 
+  step_date(date, 
+            features = c("dow", "month")) %>% 
+  step_holiday(date, 
+               holidays = timeDate::listHolidays("US")) %>% 
+  step_rm(date) %>% 
+  step_dummy(all_nominal(), -all_outcomes())
+
+```
+
+Here, we did something different than before: instead of applying a step to an individual variable, we used selectors to apply this recipe step to several variables at once.
+
+* The first selector, `all_nominal()`, selects all variables that are either factors or characters.
+
+* The second selector, `-all_outcomes()` removes any outcome variables from this recipe step.
+
+
+With these two selectors together, our recipe step above translates to:
+
+> Create dummy variables for all of the factor or character columns unless they are outcomes.
+
+
+At this stage in the recipe, this step selects the `origin`, `dest`, and `carrier` variables. It also includes two new variables, `date_dow` and `date_month`, that were created by the earlier `step_date()`.
+
+More generally, the recipe selectors mean that you don’t always have to apply steps to individual variables one at a time. Since a recipe knows the variable type and role of each column, they can also be selected (or dropped) using this information.
+
+### Zero variance
+
+
+Note that since `carrier` and `dest` have some infrequently occurring values, it is possible that dummy variables might be created for values that don’t exist in the training set. For example, there could be destinations that are only in the test set. The function  [`anti_join()`](https://dplyr.tidyverse.org/reference/join.html) returns all rows from x (test_data) where there are not matching values in y (train_data), keeping just columns from x.:
+
+```{r}
+
+test_data %>% 
+  distinct(dest) %>% 
+  anti_join(train_data)
+
+```
+
+
+When the recipe is applied to the training set, a column could contain only zeros. This is a "*zero-variance predictor*" that has no information within the column. While some R functions will not produce an error for such predictors, it usually causes warnings and other issues. `step_zv()` will remove columns from the data when the training set data have a single value, so it is added to the recipe after `step_dummy()`:
+
+```{r}
+
+flights_rec <- 
+  recipe(arr_delay ~ ., 
+         data = train_data) %>% 
+  update_role(flight, 
+              time_hour, 
+              new_role = "ID") %>% 
+  step_date(date, 
+            features = c("dow", "month")) %>% 
+  step_holiday(date, 
+               holidays = timeDate::listHolidays("US")) %>%
+  step_rm(date) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors())
+
+```
+
+### Correlations
+
+As a final step, we remove predictor variables that have large absolute correlations with other variables
+
+```{r}
+
+flights_rec <- 
+  recipe(arr_delay ~ ., 
+         data = train_data) %>% 
+  update_role(flight, 
+              time_hour, 
+              new_role = "ID") %>% 
+  step_date(date, 
+            features = c("dow", "month")) %>% 
+  step_holiday(date, 
+               holidays = timeDate::listHolidays("US")) %>%
+  step_rm(date) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_corr(all_predictors())
+
+```
+
+
+Now we’ve created a specification of what should be done with the data. Note that we did not perform any data processsing so far. 
+
+If we would like to save a copy of the preprocessed data, we would need to proceed as follow:
+
+* First of all, we need to `prep()` the recipe. This funtion will actually perform the data processing from the recipe. 
+* Then, we use the function `juice()` to obtain the data frame.
+* Finally, we can save the data.
+
+```{r, echo = T, eval = F}
+# Perform the recipe with prep()
+flights_prep <- 
+  flights_rec %>% 
+  prep()
+
+# Obtain data with juice()
+df_flight_prep <- juice(flights_prep)
+
+# Save data as rds for future use
+write_rds(df_flight_prep, "df_flight_prep.rds", compress = "gz")
+```
+
+```{r, echo = F}
+df_flight_prep <- read_rds("df_flight_prep.rds")
+```
+
+
+# Model building
+
+Let’s use some classification algorithms to model the flight data. We start by building some models using the `parsnip` package:
+
+* [List of algorithms](https://www.tidymodels.org/find/parsnip/)
+
+## Logistic regression
+
+```{r}
+
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine("glm")
+
+```
+
+## Decision tree
+
+```{r}
+
+dt_mod <- 
+  decision_tree() %>% 
+  set_engine("C5.0") %>% 
+  set_mode("classification")
+
+```
+
+## Random forest
+
+```{r}
+
+rf_mod <- 
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+```
+
+
+## Boosted tree (XGBoost)
+
+```{r}
+
+#install.packages("xgboost")
+
+xgb_mod <- 
+  boost_tree() %>% 
+  set_engine("xgboost") %>% 
+  set_mode("classification") 
+
+```
+
+# Recipe and Models
+
+We will want to use our recipe across several steps as we train and test our models. We will:
+
+* Process the recipe using the training set: This involves any estimation or calculations based on the training set. For our recipe, the training set will be used to determine which predictors should be converted to dummy variables and which predictors will have zero-variance in the training set, and should be slated for removal.
+
+* Apply the recipe to the training set: We create the final predictor set on the training set.
+
+* Apply the recipe to the test set: We create the final predictor set on the test set. Nothing is recomputed and no information from the test set is used here; the dummy variable and zero-variance results from the training set are applied to the test set.
+
+To simplify this process, we can use a *model workflow*, which pairs a model and recipe together. This is a straightforward approach because different recipes are often needed for different models, so when a model and recipe are bundled, it becomes easier to train and test workflows. We’ll use the `workflow` package from tidymodels to bundle our parsnip model (lr_mod etc.) with our recipe (flights_rec).
+
+## Fit models with workflows
+
+To combine the data preparation with the model building, we use the package [workflows](https://workflows.tidymodels.org). A workflow is an object that can bundle together your pre-processing, modeling, and post-processing requests.
+
+### Logistic regression
+
+
+```{r}
+
+flights_wflow_lr_mod <- 
+  workflow() %>% 
+  add_model(lr_mod) %>% 
+  add_recipe(flights_rec)
+
+flights_wflow_lr_mod
+
+```
+
+### Decision tree
+
+```{r}
+
+flights_wflow_dt_mod <- 
+  workflow() %>% 
+  add_model(dt_mod) %>% 
+  add_recipe(flights_rec)
+
+flights_wflow_dt_mod
+
+```
+
+### Random forest
+
+```{r}
+
+flights_wflow_rf_mod <- 
+  workflow() %>% 
+  add_model(rf_mod) %>% 
+  add_recipe(flights_rec)
+
+flights_wflow_rf_mod
+
+```
+
+### XGBoost
+
+```{r}
+
+flights_wflow_xgb_mod <- 
+  workflow() %>% 
+  add_model(xgb_mod) %>% 
+  add_recipe(flights_rec)
+
+flights_wflow_xgb_mod
+
+```
+
+
+## Train models
+
+Now, there is a single function that can be used to prepare the recipe and train the models from the resulting predictors.
+
+### Logistic regression
+
+```{r logistic-regression-train-model, eval = F}
+
+flights_fit_lr_mode <- 
+  flights_wflow_lr_mod %>% 
+  fit(data = train_data)
+
+flights_fit_lr_mode
+
+```
+
+### Decision tree 
+
+```{r, eval = F}
+
+flights_fit_dt_mode <- 
+  flights_wflow_dt_mod %>% 
+  fit(data = train_data)
+
+flights_fit_dt_mode
+
+```
+
+### Random forest
+
+```{r eval = F}
+
+flights_fit_rf_mode <- 
+  flights_wflow_rf_mod %>% 
+  fit(data = train_data)
+
+flights_fit_rf_mode
+
+```
+
+### XG Boost 
+
+```{r, eval = F}
+
+flights_fit_xgb_mode <- 
+  flights_wflow_xgb_mod %>% 
+  fit(data = train_data)
+
+flights_fit_xgb_mode
+
+```
+
+## Model recipe objects
+
+The objects above have the finalized recipe and fitted model objects inside. You may want to extract the model or recipe objects from the workflow. To do this, you can use the helper functions `pull_workflow_fit()` and `pull_workflow_prepped_recipe()`. 
+
+For example, here we pull the fitted model object then use the `broom::tidy()` function to get a tidy tibble of the Logisitc Regression model coefficients.
+
+### Logistic regression
+
+```{r, eval = F}
+
+flights_fit_lr_mode %>% 
+  pull_workflow_fit() %>% 
+  tidy()
+
+```
+
+### Decision tree 
+
+```{r, eval = F}
+
+flights_fit_xgb_mode %>% 
+  pull_workflow_prepped_recipe()
+
+```
+
+### Random forest
+
+```{r, eval = F}
+
+flights_fit_rf_mode %>% 
+  pull_workflow_prepped_recipe()
+
+```
+
+### XG Boost 
+
+```{r, eval = F}
+
+flights_fit_xgb_mode %>% 
+    pull_workflow_prepped_recipe()
+
+```
+
+## Summary
+
+Our goal was to predict whether a plane arrives more than 30 minutes late. We have just:
+
+* Built the model (`lr_mod` etc.),
+
+* Created a preprocessing recipe (`flights_rec`),
+
+* Bundled the model and recipe (`flights_wflow`), and
+
+* Trained our workflow using a single call to `fit()`.
+
+The next step is to use the trained workflow (`flights_fit`) to predict with the unseen test data, which we will do with a single call to predict(). 
+
+# Prediction
+
+The `predict()` method applies the recipe to the new data, then passes them to the fitted model. Let`s use the logistic regression model as an example for the next steps.
+
+## Logistic regression
+
+```{r, eval = F}
+
+predict(flights_fit_lr_mode, 
+        test_data)
+
+```
+
+Because our outcome variable here is a factor, the output from `predict()` returns the predicted class: late versus on_time. But, let’s say we want the predicted class *probabilities* for each flight instead. To return those, we can specify `type = "prob"` when we use `predict()`. We’ll also bind the output with some variables from the test data and save them together:
+
+
+```{r, eval = F}
+
+flights_pred_lr_mod <- 
+  predict(flights_fit_lr_mode, 
+          test_data, 
+          type = "prob") %>% 
+  bind_cols(test_data %>% 
+              select(arr_delay, 
+                     time_hour, 
+                     flight)) 
+
+```
+
+The data look like: 
+
+```{r, eval = F}
+
+head(flights_pred_lr_mod)
+
+```
+
+Now that we have a tibble with our predicted class probabilities, how will we evaluate the performance of our workflow? We would like to calculate a metric that tells how well our model predicted late arrivals, compared to the true status of our outcome variable, `arr_delay`.
+
+### ROC curve
+
+Let’s use the area under the [ROC curve](https://bookdown.org/max/FES/measuring-performance.html#class-metrics) as our metric, computed using `roc_curve()` and `roc_auc()` from the `yardstick` package.
+
+To generate a ROC curve, we need the predicted class probabilities for `late` and `on_time`, which we just calculated in the code chunk above. We can create the ROC curve with these values, using `roc_curve()` and then piping to the `autoplot()` method:
+
+```{r, eval = F}
+
+flights_pred_lr_mod %>% 
+  roc_curve(truth = arr_delay, 
+            .pred_late) %>% 
+  autoplot()
+
+```
+
+### AUC
+
+Similarly, `roc_auc()` estimates the area under the curve:
+
+```{r, eval = F}
+
+flights_pred_lr_mod %>% 
+  roc_auc(truth = arr_delay, .pred_late)
+
+```
+
+
+### Accuracy
+
+We use the `metrics()` function to measure the performance of the model. It will automatically choose metrics appropriate for a given type of model. The function expects a tibble that contains the actual results (truth) and what the model predicted (estimate).
+
+```{r, eval = F}
+
+flights_fit_lr_mode %>%
+  predict(test_data) %>%
+  bind_cols(test_data) %>%
+  metrics(truth = arr_delay, 
+          estimate = .pred_class)
+
+```
+
+
+### Recall 
+
+```{r, eval = F}
+
+flights_fit_lr_mode %>%
+  predict(test_data) %>%
+    bind_cols(test_data) %>%
+  recall(truth = arr_delay, 
+          estimate = .pred_class)
+
+```
+
+### Precision
+
+```{r, eval = F}
+
+flights_fit_lr_mode %>%
+  predict(test_data) %>%
+    bind_cols(test_data) %>%
+  precision(truth = arr_delay, 
+          estimate = .pred_class)
+
+```
+
