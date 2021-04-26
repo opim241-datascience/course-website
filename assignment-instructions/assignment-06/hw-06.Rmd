@@ -1,5 +1,5 @@
 ---
-title: "HW 08 - Exploring the GSS"
+title: "HW 06 - Exploring the GSS"
 output: 
   tufte::tufte_html:
     css: ../hw.css
@@ -33,8 +33,12 @@ In this assignment we analyze data from the 2016 GSS, using it to estimate value
 
 # Getting started
 
-Go to the course GitHub organization and locate your homework repo, clone it in RStudio and open the R Markdown document.
-Knit the document to make sure it compiles without errors.
+- [Click here to go the the Assignment in Canvas](https://georgetown.instructure.com/courses/126656/assignments/572753)
+- Click on the link inside the assignment to go to the acceptance page and accept the assignment. The name of the repository that will be created for you is `assignment-06-YOURGITHUBUSERNAME`:
+- Grab the URL of the repo, and clone it in RStudio.
+- First, open the R Markdown document `hw-06.Rmd` and Knit it.
+- Make sure it compiles without errors.
+- The output will be in the file markdown `.md` file with the same name.
 
 ## Warm up
 
@@ -143,6 +147,8 @@ Responses that were originally Don't know, No answer and Not applicable are alre
     Don't overwrite the existing `polviews`, instead pick a different, informative name for your new variable.
 
 12. Create a visualization that displays the relationship between these two new variables and interpret it.
+
+13. Attempt to build a classification model to predict the variable you created in Exercise 10, where "Yes" is 1, and "No" is 0.
 
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards and review the md document on GitHub to make sure you're happy with the final state of your work.*
 
