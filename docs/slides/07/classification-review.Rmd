@@ -1,0 +1,143 @@
+class: inverse, center, middle
+
+# Classification review
+
+---
+
+## Confusion Matrix
+
+
+.center[
+<img src="img/conf-matrix.001.jpeg" width=800>
+]
+---
+
+## Incorrect predictions
+
+.center[
+
+<img src="img/conf-matrix.002.jpeg" width=800>
+]
+---
+
+## Orange:correct, purple:incorrect
+
+.center[
+
+<img src="img/conf-matrix.003.jpeg" width=800>
+]
+---
+
+## Positives and negatives
+
+.center[
+
+<img src="img/conf-matrix.004.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+.center[
+
+<img src="img/conf-matrix.005.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+.center[
+
+<img src="img/conf-matrix.006.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+.center[
+
+<img src="img/conf-matrix.007.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+.center[
+
+<img src="img/conf-matrix.008.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+
+.center[
+<img src="img/conf-matrix.009.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+.center[
+
+<img src="img/sens-spec.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+.center[
+
+<img src="img/sens.jpeg" width=800>
+]
+---
+
+## Confusion Matrix
+
+
+.center[
+
+<img src="img/spec.jpeg" width=800>
+]
+
+---
+
+## Creating the ROC curve (setting different thresholds)
+
+.center[
+
+<img src="img/roc-animation.gif" width=700>
+]
+
+---
+
+## ROC Curve: good? bad?
+
+.center[
+<img src="img/roc-guessing.png" width=700>
+]
+
+---
+
+## ROC Curve: good? bad?
+
+.center[
+<img src="img/roc-perfect.png" width=700>
+]
+
+---
+
+## ROC Curve: good? bad?
+
+.center[
+<img src="img/roc-ok.png" width=700>
+]
+
+---
+
+## ROC Curve: good? bad?
+
+.center[
+<img src="img/roc-pretty-good.png" width=700>
+]
+

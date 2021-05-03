@@ -1,0 +1,45 @@
+---
+title: "Machine Learning review, Unsupervised Learning, Wrapup"
+subtitle: "OPIM 241 - Data Science"  
+institution: "Georgetown University"
+author: "Marck Vaisman"
+date: "Spring 2021"
+output:
+  xaringan::moon_reader:
+    self_contained: false
+    css: ["../setup/bigdata.css"]
+    nature:
+      ratio: "16:9"
+      highßlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+---
+
+
+```{r child='../setup/setup-options.Rmd'}
+```
+
+
+```{r child='classification-review.Rmd'}
+```
+
+
+---
+
+```{r child='modeling.Rmd'}
+```
+
+
+
+---
+
+```{r child='unsupervised-learning.Rmd'}
+```
+
+
+---
+
+
+```{r child='tidymodels.Rmd'}
+```

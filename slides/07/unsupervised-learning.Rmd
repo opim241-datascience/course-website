@@ -1,0 +1,16 @@
+class: inverse, center, middle
+
+# Unsupervised Learning
+
+---
+
+## [Introduction to Statistical Learning with R slides](islr-chapter-10-slides.pdf)
+
+---
+
+## Applied Examples
+
+* https://ubc-dsci.github.io/introduction-to-datascience/clustering.html
+
+* https://www.tidymodels.org/learn/statistics/k-means/
+

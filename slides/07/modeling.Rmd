@@ -1,0 +1,132 @@
+class: inverse, center, middle
+
+# Machine Learning Process
+
+
+---
+
+## The Ml Landscape 
+
+.center[
+<img src="img/ml-landscape.jpeg" width=800>
+]
+
+---
+
+## What the Modeling Process Usually Looks Like
+
+<img src="img/intro-process-1.svg" width="95%">
+
+---
+
+
+.center[
+<img src="img/predicting.001.jpeg" width=800>
+]
+
+---
+
+
+.center[
+<img src="img/predicting.002.jpeg" width=800>
+]
+---
+
+
+
+.center[
+<img src="img/predicting.003.jpeg" width=800>
+]
+
+---
+
+
+.center[
+<img src="img/predicting.004.jpeg" width=800>
+]
+---
+
+
+.center[
+<img src="img/predicting.005.jpeg" width=800>
+]
+
+---
+
+.center[
+<img src="img/predicting.006.jpeg" width=800>
+]
+
+---
+
+## Another view of the training/testing split:
+
+.center[
+<img src="img/validation-split.svg" width="40%">
+]
+
+
+---
+
+
+
+.center[
+<img src="img/predicting.007.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/predicting.008.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/predicting.009.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/predicting.010.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/recipe-hex.001.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/recipe-hex.002.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/recipe-hex.003.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/recipe-hex.004.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/recipe-hex.005.jpeg" width=800>
+]
+
+---
+.center[
+<img src="img/recipe-hex.006.jpeg" width=800>
+]
+
+---
+
+.center[
+<img src="img/recipes-process.png" width=800>
+]
+
+---
+
+.center[
+<img src="img/recipes.png" width=800>
+]
